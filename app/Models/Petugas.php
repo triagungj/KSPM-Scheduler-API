@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Partisipant extends Model
+class Petugas extends Model
 {
     use HasFactory;
 
@@ -14,17 +14,16 @@ class Partisipant extends Model
         'username',
         'jabatan_id',
         'name',
-        'member_id',
         'phone_number',
+        'is_superuser'
+    ];
+
+    protected $casts = [
+        'is_superuser' => 'boolean',
     ];
 
     public function user()
     {
         $this->belongsTo(User::class, 'username', 'username');
-    }
-
-    public function jabatan()
-    {
-        return $this->belongsTo(Jabatan::class, 'jabatan_id', 'id');
     }
 }

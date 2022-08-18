@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePartisipantsTable extends Migration
+class CreateJabatansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreatePartisipantsTable extends Migration
      */
     public function up()
     {
-        Schema::create('partisipants', function (Blueprint $table) {
+        Schema::create('jabatans', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
-            $table->string('nama');
-            $table->string('phone_number');
+            $table->unsignedBigInteger('jabatan_category_id');
+            $table->string('name');
+            $table->foreign('jabatan_category_id')
+                ->references('id')->on('jabatan_categories')->onDelete('cascade')->constrained('jabatan_categories');
             $table->timestamps();
         });
     }
@@ -29,6 +30,6 @@ class CreatePartisipantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partisipants');
+        Schema::dropIfExists('jabatans');
     }
 }
