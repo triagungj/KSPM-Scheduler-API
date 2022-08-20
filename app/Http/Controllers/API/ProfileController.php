@@ -43,4 +43,35 @@ class ProfileController extends Controller
                 );
         }
     }
+    public function edit(Request $request)
+    {
+        $user = auth()->user();
+        if ($user->is_petugas) {
+            $data =
+                Petugas::where('username', $user->username)->firstOrFail();
+            $data->name = $request->name;
+            $data->phone_number = $request->phone_number;
+            $data->save();
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Update Successed!'
+                ],
+            );
+        } else {
+            $data =
+                Partisipant::where('username', $user->username)->firstOrFail();
+            $data->name = $request->name;
+            $data->member_id = $request->member_id;
+            $data->phone_number = $request->phone_number;
+            $data->save();
+            return
+                response()->json(
+                    [
+                        'status' => 200,
+                        'message' => 'Update Successed!'
+                    ],
+                );
+        }
+    }
 }

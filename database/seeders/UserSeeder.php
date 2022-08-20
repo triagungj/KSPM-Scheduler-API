@@ -15,7 +15,7 @@ class UserSeeder extends Seeder
     {
         User::create([
             'username' => 'triagungj',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'is_petugas' => true,
         ]);
 
@@ -28,7 +28,7 @@ class UserSeeder extends Seeder
 
         User::create([
             'username' => 'validator',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'is_petugas' => true,
         ]);
 
@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
 
         User::create([
             'username' => 'faradhika',
-            'password' => Hash::make('123456'),
+            'password' => Hash::make('12345678'),
             'is_petugas' => false,
         ]);
 

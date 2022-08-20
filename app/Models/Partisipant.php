@@ -16,6 +16,7 @@ class Partisipant extends Model
         'name',
         'member_id',
         'phone_number',
+        'avatar_url',
     ];
 
     public function user()

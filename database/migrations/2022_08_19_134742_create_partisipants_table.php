@@ -20,6 +20,7 @@ class CreatePartisipantsTable extends Migration
             $table->string('name');
             $table->string('member_id');
             $table->string('phone_number');
+            $table->string('avatar_url')->nullable();
             $table->foreign('jabatan_id')
                 ->references('id')->on('jabatans')->onDelete('cascade')->constrained('jabatans');
             $table->timestamps();
