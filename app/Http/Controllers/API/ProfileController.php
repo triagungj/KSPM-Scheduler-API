@@ -23,6 +23,7 @@ class ProfileController extends Controller
                         'phone_number' => $data->phone_number,
                     ]
                 ],
+                200
             );
         } else {
             $data =
@@ -39,6 +40,7 @@ class ProfileController extends Controller
                             'member_id' => $data->member_id,
                         ]
                     ],
+                    200
                 );
         }
     }
