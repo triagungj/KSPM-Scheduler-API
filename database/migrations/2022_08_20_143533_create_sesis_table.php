@@ -15,12 +15,12 @@ class CreateSesisTable extends Migration
     {
         Schema::create('sesis', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('pertemuan_id');
+            $table->foreignId('pertemuan_id');
             $table->string('name');
             $table->enum('hari', ['senin', 'selasa', 'rabu', 'kamis', 'jumat']);
             $table->string('waktu');
             $table->foreign('pertemuan_id')
-            ->references('id')->on('pertemuans')->onDelete('cascade')->constrained('pertemuans');
+                ->references('id')->on('pertemuans')->onDelete('cascade')->constrained('pertemuans');
             $table->timestamps();
         });
     }
