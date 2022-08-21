@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Jabatan;
-use App\Models\JabatanCategory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

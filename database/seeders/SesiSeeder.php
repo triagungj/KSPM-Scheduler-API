@@ -6,6 +6,7 @@ use App\Models\Enum\DayEnum;
 use App\Models\Sesi;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class SesiSeeder extends Seeder
 {
@@ -26,6 +27,7 @@ class SesiSeeder extends Seeder
 
         // SENIN
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 1',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Senin,
@@ -33,6 +35,7 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 2',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Senin,
@@ -40,12 +43,14 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 3',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Senin,
             'waktu' => '12:50 - 14.20'
         ]);
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 4',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Senin,
@@ -54,6 +59,7 @@ class SesiSeeder extends Seeder
 
         // SELASA
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 1',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Selasa,
@@ -61,6 +67,7 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 2',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Selasa,
@@ -68,12 +75,14 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 3',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Selasa,
             'waktu' => '12:50 - 14.20'
         ]);
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 4',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Selasa,
@@ -82,6 +91,7 @@ class SesiSeeder extends Seeder
 
         // RABU
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 1',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Rabu,
@@ -89,6 +99,7 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 2',
             'pertemuan_id' => $pertemuan1->id,
             'hari' => DayEnum::Rabu,
@@ -96,12 +107,14 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 3',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Rabu,
             'waktu' => '12:50 - 14.20'
         ]);
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 4',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Rabu,
@@ -110,6 +123,7 @@ class SesiSeeder extends Seeder
 
         // KAMIS
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 1',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Kamis,
@@ -117,6 +131,7 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 2',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Kamis,
@@ -124,12 +139,14 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 3',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Kamis,
             'waktu' => '12:50 - 14.20'
         ]);
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 4',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Kamis,
@@ -138,6 +155,7 @@ class SesiSeeder extends Seeder
 
         // JUMAT
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 1',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Jumat,
@@ -145,6 +163,7 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 2',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Jumat,
@@ -152,12 +171,14 @@ class SesiSeeder extends Seeder
         ]);
 
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 3',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Jumat,
             'waktu' => '12:50 - 14.20'
         ]);
         Sesi::create([
+            'id' => Str::uuid()->toString(),
             'name' => 'Sesi 4',
             'pertemuan_id' => $pertemuan2->id,
             'hari' => DayEnum::Jumat,
