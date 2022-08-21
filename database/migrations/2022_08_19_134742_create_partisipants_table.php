@@ -14,9 +14,9 @@ class CreatePartisipantsTable extends Migration
     public function up()
     {
         Schema::create('partisipants', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('username')->unique();
-            $table->unsignedBigInteger('jabatan_id');
+            $table->uuid('jabatan_id')->nullable(false);
             $table->string('name');
             $table->string('member_id');
             $table->string('phone_number');
