@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\SesiController;
 use Illuminate\Support\Facades\Route;
 
 // * AUTH
@@ -17,3 +18,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('profile', [ProfileController::class, 'index']);
     Route::post('profile/edit', [ProfileController::class, 'edit']);
 });
+
+// * SESSION
+Route::get('schedule/session', [SesiController::class, 'index']);

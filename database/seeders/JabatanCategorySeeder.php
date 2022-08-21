@@ -7,11 +7,7 @@ use Illuminate\Database\Seeder;
 
 class JabatanCategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
+
     public function run()
     {
         JabatanCategory::create([

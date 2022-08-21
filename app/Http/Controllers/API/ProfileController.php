@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Jabatan;
 use App\Models\Partisipant;
 use App\Models\Petugas;
 use Illuminate\Http\Request;

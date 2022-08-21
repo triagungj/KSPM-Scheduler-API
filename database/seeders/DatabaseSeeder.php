@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             JabatanCategorySeeder::class,
             JabatanSeeder::class,
             UserSeeder::class,
+            PertemuanSeeder::class,
+            SesiSeeder::class,
         ]);
     }
 }
