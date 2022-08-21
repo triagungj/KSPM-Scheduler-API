@@ -31,6 +31,7 @@ class AuthController extends Controller
         }
 
         $user = User::create([
+            'id' => Str::uuid()->toString(),
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'is_petugas' => $request->is_petugas,
