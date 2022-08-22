@@ -14,7 +14,7 @@ class CreatePertemuansTable extends Migration
     public function up()
     {
         Schema::create('pertemuans', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('name');
             $table->timestamps();
         });

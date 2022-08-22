@@ -11,41 +11,35 @@ class ProfileController extends Controller
 {
     public function index()
     {
-        if (!auth()->check()) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        $user = auth()->user();
+        if ($user->is_petugas) {
+            $data =
+                Petugas::where('username', $user->username)->firstOrFail();
+            return response()->json(
+                [
+                    'status' => 200,
+                    'data' => [
+                        'name' => $data->name,
+                        'phone_number' => $data->phone_number,
+                    ]
+                ],
+            );
         } else {
-            $user = auth()->user();
-            if ($user->is_petugas) {
-                $data =
-                    Petugas::where('username', $user->username)->firstOrFail();
-                return response()->json(
+            $data =
+                Partisipant::where('username', $user->username)->firstOrFail();
+            $jabatan = $data->jabatan;
+            return
+                response()->json(
                     [
                         'status' => 200,
                         'data' => [
                             'name' => $data->name,
                             'phone_number' => $data->phone_number,
+                            'jabatan' => $jabatan->name,
+                            'member_id' => $data->member_id,
                         ]
                     ],
-                    200
                 );
-            } else {
-                $data =
-                    Partisipant::where('username', $user->username)->firstOrFail();
-                $jabatan = $data->jabatan;
-                return
-                    response()->json(
-                        [
-                            'status' => 200,
-                            'data' => [
-                                'name' => $data->name,
-                                'phone_number' => $data->phone_number,
-                                'jabatan' => $jabatan->name,
-                                'member_id' => $data->member_id,
-                            ]
-                        ],
-                        200
-                    );
-            }
         }
     }
     public function edit(Request $request)

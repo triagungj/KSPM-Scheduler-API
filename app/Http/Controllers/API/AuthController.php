@@ -11,8 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Illuminate\Support\Str;
-
 
 class AuthController extends Controller
 {
@@ -31,7 +29,6 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'id' => Str::uuid()->toString(),
             'username' => $request->username,
             'password' => Hash::make($request->password),
             'is_petugas' => $request->is_petugas,
@@ -39,7 +36,6 @@ class AuthController extends Controller
 
         if ($request->is_superuser != null) {
             Petugas::create([
-                'id' => Str::uuid()->toString(),
                 'username' => $request->username,
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
@@ -47,7 +43,6 @@ class AuthController extends Controller
             ]);
         } else {
             Partisipant::create([
-                'id' => Str::uuid()->toString(),
                 'username' => $request->username,
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,

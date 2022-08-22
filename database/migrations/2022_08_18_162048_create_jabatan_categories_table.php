@@ -14,7 +14,7 @@ class CreateJabatanCategoriesTable extends Migration
     public function up()
     {
         Schema::create('jabatan_categories', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('name');
             $table->timestamps();
         });
