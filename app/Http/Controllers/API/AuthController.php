@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Partisipant;
 use App\Models\Petugas;
+use App\Models\ScheduleRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -46,6 +47,14 @@ class AuthController extends Controller
                 'username' => $request->username,
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
+                'jabatan_id' => $request->jabatan_id,
+                'member_id' => $request->member_id,
+            ]);
+
+            $partisipant = Partisipant::where('username', $user->username)->firstOrFail();
+
+            ScheduleRequest::create([
+                'partisipant_id' => $partisipant->id,
             ]);
         }
 

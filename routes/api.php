@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProfileController;
+use App\Http\Controllers\API\ScheduleRequestController;
 use App\Http\Controllers\API\SesiController;
+use App\Models\ScheduleRequest;
 use Illuminate\Support\Facades\Route;
 
 // * AUTH
@@ -21,3 +23,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 // * SESSION
 Route::get('schedule/session', [SesiController::class, 'index']);
+
+
+// * SCHEDULE REQUEST
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('schedule/save', [ScheduleRequestController::class, 'saveRequest']);
+    Route::post('schedule/request', [ScheduleRequestController::class, 'requestSchedule']);
+});
