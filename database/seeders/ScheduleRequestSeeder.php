@@ -15,8 +15,6 @@ class ScheduleRequestSeeder extends Seeder
      */
     public function run()
     {
-        ScheduleRequest::create([
-            'partisipant_id' => 1,
-        ]);
+        //    
     }
 }

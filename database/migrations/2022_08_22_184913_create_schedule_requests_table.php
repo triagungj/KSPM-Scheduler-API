@@ -14,9 +14,9 @@ class CreateScheduleRequestsTable extends Migration
     public function up()
     {
         Schema::create('schedule_requests', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('partisipant_id');
-            $table->unsignedBigInteger('petugas_id')->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('partisipant_id');
+            $table->uuid('petugas_id')->nullable();
             $table->enum('status', ['requested', 'accepted', 'rejected'])->nullable();
             $table->string('catatan_partisipant')->nullable();
             $table->string('catatan_petugas')->nullable();

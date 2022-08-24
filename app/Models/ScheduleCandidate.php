@@ -17,6 +17,7 @@ class ScheduleCandidate extends Model
 
     protected $casts = [
         'status' => StatusEnum::class,
+        'id' => 'string'
     ];
 
     public function scheduleRequest()

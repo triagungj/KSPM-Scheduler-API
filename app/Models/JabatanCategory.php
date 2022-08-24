@@ -18,4 +18,7 @@ class JabatanCategory extends Model
     {
         return $this->belongsToMany(Jabatan::class);
     }
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

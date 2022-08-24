@@ -13,4 +13,7 @@ class Pertemuan extends Model
         'id',
         'name'
     ];
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

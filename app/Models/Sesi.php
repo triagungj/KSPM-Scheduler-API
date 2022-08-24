@@ -11,6 +11,7 @@ class Sesi extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'name',
         'pertemuan_id',
         'hari',
@@ -19,6 +20,7 @@ class Sesi extends Model
 
     protected $casts = [
         'hari' => DayEnum::class,
+        'id' => 'string'
     ];
 
     public function pertemuan()

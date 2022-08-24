@@ -8,6 +8,7 @@ use App\Models\Partisipant;
 use App\Models\ScheduleCandidate;
 use App\Models\ScheduleRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ScheduleRequestController extends Controller
 {
@@ -23,6 +24,7 @@ class ScheduleRequestController extends Controller
 
             foreach ($listSession as $session) {
                 ScheduleCandidate::create([
+                    'id' => Str::uuid(),
                     'schedule_request_id' => $dataRequestSchedule->id,
                     'session_id' => $session,
                 ]);

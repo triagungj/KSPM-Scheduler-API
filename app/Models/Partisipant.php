@@ -28,4 +28,7 @@ class Partisipant extends Model
     {
         return $this->belongsTo(Jabatan::class, 'jabatan_id', 'id');
     }
+    protected $casts = [
+        'id' => 'string'
+    ];
 }

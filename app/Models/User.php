@@ -18,6 +18,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'id',
         'username',
         'password',
         'is_petugas',
@@ -35,5 +36,6 @@ class User extends Authenticatable
 
     protected $casts = [
         'is_petugas' => 'boolean',
+        'id' => 'string'
     ];
 }
