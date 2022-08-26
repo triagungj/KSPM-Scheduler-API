@@ -14,9 +14,7 @@ class SesiController extends Controller
     {
         $result = [];
         $detailResult = [];
-        $detailDataResult = [];
-        $collection =
-            DB::table('sesis')
+        $collection = DB::table('sesis')
             ->selectRaw('count(id) as total, hari')
             ->groupBy('hari')
             ->get();
@@ -28,14 +26,6 @@ class SesiController extends Controller
             ];
             array_push($result, $detailResult);
         }
-        // foreach (Sesi::all() as $sesi) {
-
-        //     array_push($result, $detailResult);
-        //     $temp = $sesi->hari;
-        //     $detailDataResult = [];
-
-        // }
-
 
         return response()->json(
             [

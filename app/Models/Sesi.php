@@ -20,7 +20,6 @@ class Sesi extends Model
 
     protected $casts = [
         'hari' => DayEnum::class,
-        'id' => 'string'
     ];
 
     public function pertemuan()

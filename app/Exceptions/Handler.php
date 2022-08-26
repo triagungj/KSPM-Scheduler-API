@@ -88,7 +88,7 @@ class Handler extends ExceptionHandler
                 $response['errors'] = $exception->original['errors'];
                 break;
             default:
-                $response['message'] = ($statusCode == 500) ? 'Whoops, looks like something went wrong' : $exception->getMessage();
+                $response['message'] = ($statusCode == 500) ? 'Maaf terjadi kesalahan. Coba lagi.' : $exception->getMessage();
                 break;
         }
 

@@ -16,7 +16,7 @@ class CreateScheduleCandidatesTable extends Migration
         Schema::create('schedule_candidates', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('schedule_request_id');
-            $table->uuid('session_id');
+            $table->unsignedBigInteger('session_id');
             $table->foreign('schedule_request_id')
                 ->references('id')->on('schedule_requests')->onDelete('cascade')->constrained('schedule_requests');
             $table->foreign('session_id')

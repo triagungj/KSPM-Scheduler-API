@@ -14,7 +14,7 @@ class CreateSesisTable extends Migration
     public function up()
     {
         Schema::create('sesis', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->uuid('pertemuan_id');
             $table->string('name');
             $table->enum('hari', ['senin', 'selasa', 'rabu', 'kamis', 'jumat']);
