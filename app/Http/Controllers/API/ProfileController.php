@@ -29,7 +29,7 @@ class ProfileController extends Controller
             $data =
                 Partisipant::where('username', $user->username)->firstOrFail();
             $jabatan = $data->jabatan;
-            $avatarUrl = $data->avatar_url == null
+            $avatarUrl = $data->avatar_url != null
                 ? url('/image') . '/' . $data->avatar_url
                 : null;
             return
