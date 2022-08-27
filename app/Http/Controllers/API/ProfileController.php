@@ -29,7 +29,7 @@ class ProfileController extends Controller
             $data =
                 Partisipant::where('username', $user->username)->firstOrFail();
             $jabatan = $data->jabatan;
-            $avatarUrl = public_path() . '/public/images/' . $data->avatar_url;
+            $avatarUrl = url('/image') . '/' . $data->avatar_url;
             return
                 response()->json(
                     [
@@ -83,8 +83,8 @@ class ProfileController extends Controller
             $data->member_id = $request->member_id;
             $data->phone_number = $request->phone_number;
             if ($image = $request->file('image')) {
-                $filePath = $image->store('public/images');
-                $data->avatar_url = $filePath;
+                $image->store('/public/images');
+                $data->avatar_url = $image->hashName();
             }
             $data->save();
             return

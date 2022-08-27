@@ -4,6 +4,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\ScheduleRequestController;
 use App\Http\Controllers\API\SesiController;
+use App\Http\Controllers\API\FileController;
 use App\Models\ScheduleRequest;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('auth/change-password', [AuthController::class, 'changePassword']);
     Route::post('auth/logout', [AuthController::class, 'logout']);
 });
+
+// *FILE
+Route::get('image/{imagename}', [FileController::class, 'image']);
 
 // * PROFILE
 Route::group(['middleware' => ['auth:sanctum']], function () {
