@@ -56,8 +56,7 @@ class ScheduleRequestController extends Controller
 
             $listSessionId = [];
             foreach ($listScheduleCandidate as $scheduleCandidate) {
-
-                array_push($listSessionId, $scheduleCandidate->session_id);
+                array_push($listSessionId, (int) $scheduleCandidate->session_id);
             }
 
             $fileUrl = $dataRequestSchedule->bukti != null
