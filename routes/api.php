@@ -18,6 +18,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 // *FILE
 Route::get('image/{imagename}', [FileController::class, 'image']);
+Route::get('file/{fileName}', [FileController::class, 'file']);
 
 // * PROFILE
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -26,11 +27,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 });
 
 // * SESSION
-Route::get('schedule/session', [SesiController::class, 'index']);
-
 
 // * SCHEDULE REQUEST
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('schedule/save', [ScheduleRequestController::class, 'saveRequest']);
-    Route::post('schedule/request', [ScheduleRequestController::class, 'requestSchedule']);
+    Route::get('request/session', [ScheduleRequestController::class, 'getListSession']);
+    Route::get('request', [ScheduleRequestController::class, 'getListMySession']);
+    Route::post('request/save', [ScheduleRequestController::class, 'saveRequest']);
+    Route::post('request/send', [ScheduleRequestController::class, 'requestSchedule']);
 });

@@ -28,6 +28,15 @@ class ScheduleRequest extends Model
 
     public function scheduleCandidate()
     {
-        return $this->belongsToMany(ScheduleCandidate::class);
+        return $this->hasMany(ScheduleCandidate::class, 'schedule_request_id', 'id');
+    }
+
+    public function petugas()
+    {
+        return $this->hasOne(Petugas::class, 'id', 'petugas_id');
+    }
+    public function partisipant()
+    {
+        return $this->belongsTo(Partisipant::class, 'partisipant_id', 'id');
     }
 }

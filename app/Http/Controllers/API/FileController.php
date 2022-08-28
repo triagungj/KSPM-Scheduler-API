@@ -12,4 +12,9 @@ class FileController extends Controller
         $path = storage_path('app/public/images/' . $imagename);
         return Response::download($path);
     }
+    public function file($filename)
+    {
+        $path = storage_path('app/public/files/' . $filename);
+        return Response::download($path);
+    }
 }

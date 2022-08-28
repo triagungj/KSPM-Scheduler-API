@@ -31,4 +31,9 @@ class Partisipant extends Model
     protected $casts = [
         'id' => 'string'
     ];
+
+    public function scheduleRequest()
+    {
+        return $this->belongsTo(ScheduleRequest::class, 'id', 'partisipant_id');
+    }
 }

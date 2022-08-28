@@ -26,4 +26,9 @@ class Petugas extends Model
     {
         $this->belongsTo(User::class, 'username', 'username');
     }
+
+    public function scheduleRequest()
+    {
+        return $this->hasMany(ScheduleRequest::class);
+    }
 }
