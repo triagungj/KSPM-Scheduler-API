@@ -49,8 +49,7 @@ class ScheduleRequestController extends Controller
     {
         $user = auth()->user();
         if (!$user->is_petugas) {
-            $dataPartisipant =
-                Partisipant::where('username', $user->username)->firstOrFail();
+            $dataPartisipant = $user->partisipant;
             $dataRequestSchedule = $dataPartisipant->scheduleRequest;
             $listScheduleCandidate = $dataRequestSchedule->scheduleCandidate;
 
@@ -92,14 +91,13 @@ class ScheduleRequestController extends Controller
         $user = auth()->user();
         if (!$user->is_petugas) {
             $validator = Validator::make($request->all(), [
-                'file' => 'mimes:pdf,jpg,jpeg,png|max:2048',
+                'file' => 'mimes:pdf|max:2048',
             ]);
             if ($validator->fails()) {
                 return response()->json($validator->errors());
             }
 
-            $dataPartisipant =
-                Partisipant::where('username', $user->username)->firstOrFail();
+            $dataPartisipant = $user->partisipant;
             $dataRequestSchedule = $dataPartisipant->scheduleRequest;
             ScheduleCandidate::where('schedule_request_id', $dataRequestSchedule->id)->delete();
 
@@ -135,7 +133,7 @@ class ScheduleRequestController extends Controller
     public function requestSchedule(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'mimes:pdf,jpg,jpeg,png|max:2048',
+            'file' => 'mimes:pdf|max:2048',
         ]);
         if ($validator->fails()) {
             return response()->json(['status' => 401, 'message' => $validator->errors()->first(),], 401);
@@ -143,12 +141,11 @@ class ScheduleRequestController extends Controller
         $user = auth()->user();
         if (!$user->is_petugas) {
 
-            $dataPartisipant =
-                Partisipant::where('username', $user->username)->firstOrFail();
+            $dataPartisipant = $user->partisipant;
             $dataRequestSchedule = $dataPartisipant->scheduleRequest;
             if ($dataRequestSchedule->bukti == null) {
                 $validator = Validator::make($request->all(), [
-                    'file' => 'required|mimes:pdf,jpg,jpeg,png|max:2048',
+                    'file' => 'required|mimes:pdf|max:2048',
                 ]);
                 if ($validator->fails()) {
                     return response()->json(['status' => 401, 'message' => $validator->errors()->first(),], 401);
@@ -181,6 +178,30 @@ class ScheduleRequestController extends Controller
                     [
                         'status' => 200,
                         'message' => 'Update Successed!'
+                    ],
+                );
+        } else {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+    }
+
+    public function postpone()
+    {
+        $user = auth()->user();
+        if (!$user->is_petugas) {
+            $dataPartisipant = $user->partisipant;
+            $dataRequestSchedule = $dataPartisipant->scheduleRequest;
+
+            $dataRequestSchedule->status = null;
+            $dataRequestSchedule->petugas_id = null;
+            $dataRequestSchedule->catatan_petugas = null;
+            $dataRequestSchedule->save();
+
+            return
+                response()->json(
+                    [
+                        'status' => 200,
+                        'message' => 'Berhasil!',
                     ],
                 );
         } else {

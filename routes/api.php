@@ -34,4 +34,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('request', [ScheduleRequestController::class, 'getListMySession']);
     Route::post('request/save', [ScheduleRequestController::class, 'saveRequest']);
     Route::post('request/send', [ScheduleRequestController::class, 'requestSchedule']);
+    Route::get('request/postpone', [ScheduleRequestController::class, 'postpone']);
 });

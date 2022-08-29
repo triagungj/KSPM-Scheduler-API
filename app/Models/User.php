@@ -38,4 +38,14 @@ class User extends Authenticatable
         'is_petugas' => 'boolean',
         'id' => 'string'
     ];
+
+    public function partisipant()
+    {
+        return $this->hasOne(Partisipant::class, 'username', 'username');
+    }
+
+    public function petugas()
+    {
+        return $this->hasOne(Petugas::class, 'username', 'username');
+    }
 }

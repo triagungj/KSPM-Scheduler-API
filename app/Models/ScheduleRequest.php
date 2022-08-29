@@ -37,6 +37,6 @@ class ScheduleRequest extends Model
     }
     public function partisipant()
     {
-        return $this->belongsTo(Partisipant::class, 'partisipant_id', 'id');
+        return $this->hasOne(Partisipant::class, 'id', 'partisipant_id');
     }
 }
