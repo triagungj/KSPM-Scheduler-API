@@ -4,9 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Enum\StatusEnum;
-use App\Models\Partisipant;
 use App\Models\ScheduleCandidate;
-use App\Models\ScheduleRequest;
 use App\Models\Sesi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,8 +47,8 @@ class ScheduleRequestController extends Controller
     {
         $user = auth()->user();
         if (!$user->is_petugas) {
-            $dataPartisipant = $user->partisipant;
-            $dataRequestSchedule = $dataPartisipant->scheduleRequest;
+            $dataPartisipan = $user->partisipan;
+            $dataRequestSchedule = $dataPartisipan->scheduleRequest;
             $listScheduleCandidate = $dataRequestSchedule->scheduleCandidate;
 
             $listSessionId = [];
@@ -69,7 +67,7 @@ class ScheduleRequestController extends Controller
                     ? $dataRequestSchedule->petugas->phone_number
                     : null,
                 'bukti' => $fileUrl,
-                'partisipant_notes' => $dataRequestSchedule->catatan_partisipant,
+                'partisipan_notes' => $dataRequestSchedule->catatan_partisipan,
                 'petugas_notes' => $dataRequestSchedule->catatan_petugas,
                 'session_list_id' => $listSessionId,
             ];
@@ -97,8 +95,8 @@ class ScheduleRequestController extends Controller
                 return response()->json($validator->errors());
             }
 
-            $dataPartisipant = $user->partisipant;
-            $dataRequestSchedule = $dataPartisipant->scheduleRequest;
+            $dataPartisipan = $user->partisipan;
+            $dataRequestSchedule = $dataPartisipan->scheduleRequest;
             ScheduleCandidate::where('schedule_request_id', $dataRequestSchedule->id)->delete();
 
             $listSession = $request->input('list_session_id');
@@ -111,7 +109,7 @@ class ScheduleRequestController extends Controller
                 ]);
             }
 
-            $dataRequestSchedule->catatan_partisipant = $request->partisipant_notes;
+            $dataRequestSchedule->catatan_partisipan = $request->partisipan_notes;
             if ($file = $request->file('file')) {
                 $file->store('/public/files');
                 $dataRequestSchedule->bukti = $file->hashName();
@@ -141,8 +139,8 @@ class ScheduleRequestController extends Controller
         $user = auth()->user();
         if (!$user->is_petugas) {
 
-            $dataPartisipant = $user->partisipant;
-            $dataRequestSchedule = $dataPartisipant->scheduleRequest;
+            $dataPartisipan = $user->partisipan;
+            $dataRequestSchedule = $dataPartisipan->scheduleRequest;
             if ($dataRequestSchedule->bukti == null) {
                 $validator = Validator::make($request->all(), [
                     'file' => 'required|mimes:pdf|max:2048',
@@ -163,7 +161,7 @@ class ScheduleRequestController extends Controller
                 ]);
             }
 
-            $dataRequestSchedule->catatan_partisipant = $request->partisipant_notes;
+            $dataRequestSchedule->catatan_partisipan = $request->partisipan_notes;
             if ($file = $request->file('file')) {
                 $file->store('/public/files');
                 $dataRequestSchedule->bukti = $file->hashName();
@@ -189,8 +187,8 @@ class ScheduleRequestController extends Controller
     {
         $user = auth()->user();
         if (!$user->is_petugas) {
-            $dataPartisipant = $user->partisipant;
-            $dataRequestSchedule = $dataPartisipant->scheduleRequest;
+            $dataPartisipan = $user->partisipan;
+            $dataRequestSchedule = $dataPartisipan->scheduleRequest;
 
             $dataRequestSchedule->status = null;
             $dataRequestSchedule->petugas_id = null;

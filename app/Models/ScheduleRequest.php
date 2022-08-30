@@ -12,10 +12,10 @@ class ScheduleRequest extends Model
 
     protected $fillable = [
         'id',
-        'partisipant_id',
+        'partisipan_id',
         'petugas_id',
         'status',
-        'catatan_partisipant',
+        'catatan_partisipan',
         'catatan_petugas',
         'bukti',
         'tanggal_validasi',
@@ -35,8 +35,8 @@ class ScheduleRequest extends Model
     {
         return $this->hasOne(Petugas::class, 'id', 'petugas_id');
     }
-    public function partisipant()
+    public function partisipan()
     {
-        return $this->hasOne(Partisipant::class, 'id', 'partisipant_id');
+        return $this->hasOne(Partisipan::class, 'id', 'partisipan_id');
     }
 }

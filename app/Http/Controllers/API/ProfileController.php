@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Partisipant;
+use App\Models\Partisipan;
 use App\Models\Petugas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -27,7 +27,7 @@ class ProfileController extends Controller
             );
         } else {
             $data =
-                Partisipant::where('username', $user->username)->firstOrFail();
+                Partisipan::where('username', $user->username)->firstOrFail();
             $jabatan = $data->jabatan;
             $avatarUrl = $data->avatar_url != null
                 ? url('/image') . '/' . $data->avatar_url
@@ -80,7 +80,7 @@ class ProfileController extends Controller
                 return response()->json($validator->errors());
             }
             $data =
-                Partisipant::where('username', $user->username)->firstOrFail();
+                Partisipan::where('username', $user->username)->firstOrFail();
             $data->name = $request->name;
             $data->member_id = $request->member_id;
             $data->phone_number = $request->phone_number;

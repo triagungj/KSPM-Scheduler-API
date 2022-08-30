@@ -15,15 +15,15 @@ class CreateScheduleRequestsTable extends Migration
     {
         Schema::create('schedule_requests', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('partisipant_id');
+            $table->uuid('partisipan_id');
             $table->uuid('petugas_id')->nullable();
             $table->enum('status', ['requested', 'accepted', 'rejected'])->nullable();
-            $table->string('catatan_partisipant')->nullable();
+            $table->string('catatan_partisipan')->nullable();
             $table->string('catatan_petugas')->nullable();
             $table->string('bukti')->nullable();
             $table->date('tanggal_validasi')->nullable();
-            $table->foreign('partisipant_id')
-                ->references('id')->on('partisipants')->onDelete('cascade')->constrained('partisipants');
+            $table->foreign('partisipan_id')
+                ->references('id')->on('partisipans')->onDelete('cascade')->constrained('partisipans');
             $table->foreign('petugas_id')
                 ->references('id')->on('petugas')->onDelete('set null')->constrained('petugas');
             $table->timestamps();

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePartisipantsTable extends Migration
+class CreatePartisipansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreatePartisipantsTable extends Migration
      */
     public function up()
     {
-        Schema::create('partisipants', function (Blueprint $table) {
+        Schema::create('partisipans', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('username')->unique();
             $table->uuid('jabatan_id');
@@ -23,6 +23,8 @@ class CreatePartisipantsTable extends Migration
             $table->string('avatar_url')->nullable();
             $table->foreign('jabatan_id')
                 ->references('id')->on('jabatans')->onDelete('cascade')->constrained('jabatans');
+            $table->foreign('username')
+                ->references('username')->on('users')->onDelete('cascade')->constrained('users');
             $table->timestamps();
         });
     }
@@ -34,6 +36,6 @@ class CreatePartisipantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partisipants');
+        Schema::dropIfExists('partisipans');
     }
 }

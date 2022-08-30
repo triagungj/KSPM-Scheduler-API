@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\Partisipant;
+use App\Models\Partisipan;
 use App\Models\Petugas;
 use App\Models\ScheduleRequest;
 use App\Models\User;
@@ -46,7 +46,7 @@ class AuthController extends Controller
                 'is_superuser' => $request->is_superuser,
             ]);
         } else {
-            Partisipant::create([
+            Partisipan::create([
                 'id' => Str::uuid(),
                 'username' => $request->username,
                 'name' => $request->name,
@@ -55,11 +55,11 @@ class AuthController extends Controller
                 'member_id' => $request->member_id,
             ]);
 
-            $partisipant = Partisipant::where('username', $user->username)->firstOrFail();
+            $partisipan = Partisipan::where('username', $user->username)->firstOrFail();
 
             ScheduleRequest::create([
                 'id' => Str::uuid(),
-                'partisipant_id' => $partisipant->id,
+                'partisipan_id' => $partisipan->id,
             ]);
         }
 
@@ -69,7 +69,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         if (!Auth::attempt($request->only('username', 'password'))) {
-            return response()->json(['message' => 'Username/Passowrd salah'], 401);
+            return response()->json(['message' => 'Username/Password salah'], 401);
         }
 
         $user = User::where('username', $request['username'])->firstOrFail();
@@ -80,7 +80,7 @@ class AuthController extends Controller
                 Petugas::where('username', $request['username'])->firstOrFail();
             return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'is_superuser' => $data->is_superuser, 'message' => 'Login Berhasil!', 'token' => $token]);
         } else {
-            $data = Partisipant::where('username', $request['username'])->firstOrFail();
+            $data = Partisipan::where('username', $request['username'])->firstOrFail();
             return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
         }
     }

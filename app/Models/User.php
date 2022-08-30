@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -39,9 +38,9 @@ class User extends Authenticatable
         'id' => 'string'
     ];
 
-    public function partisipant()
+    public function partisipan()
     {
-        return $this->hasOne(Partisipant::class, 'username', 'username');
+        return $this->hasOne(Partisipan::class, 'username', 'username');
     }
 
     public function petugas()

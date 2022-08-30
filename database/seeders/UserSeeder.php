@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Jabatan;
 use App\Models\JabatanCategory;
-use App\Models\Partisipant;
+use App\Models\Partisipan;
 use App\Models\Petugas;
 use App\Models\ScheduleRequest;
 use App\Models\User;
@@ -58,7 +58,7 @@ class UserSeeder extends Seeder
         $jabatan = DB::table('jabatans')
             ->inRandomOrder()
             ->first();
-        Partisipant::create([
+        Partisipan::create([
             'id' => $userUuid,
             'username' => 'faradhika',
             'name' => 'Faradhika M. D.',
@@ -69,7 +69,7 @@ class UserSeeder extends Seeder
 
         ScheduleRequest::create([
             'id' => Str::uuid(),
-            'partisipant_id' => $userUuid,
+            'partisipan_id' => $userUuid,
         ]);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Partisipant extends Model
+class Partisipan extends Model
 {
     use HasFactory;
 
@@ -34,6 +34,6 @@ class Partisipant extends Model
 
     public function scheduleRequest()
     {
-        return $this->belongsTo(ScheduleRequest::class, 'id', 'partisipant_id');
+        return $this->belongsTo(ScheduleRequest::class, 'id', 'partisipan_id');
     }
 }
