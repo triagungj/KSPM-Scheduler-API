@@ -56,7 +56,7 @@ class ProfileController extends Controller
                 'phone_number' => 'required|string|min:8',
             ]);
             if ($validator->fails()) {
-                return response()->json([$validator->errors()], 401);
+                return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 401);
             }
             $data =
                 Petugas::where('username', $user->username)->firstOrFail();
@@ -77,7 +77,7 @@ class ProfileController extends Controller
                 'image' => 'mimes:png,jpg,jpeg|max:2048',
             ]);
             if ($validator->fails()) {
-                return response()->json($validator->errors());
+                return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 401);
             }
             $data =
                 Partisipan::where('username', $user->username)->firstOrFail();

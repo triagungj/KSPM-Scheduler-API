@@ -146,7 +146,7 @@ class ScheduleRequestController extends Controller
                     'file' => 'required|mimes:pdf|max:2048',
                 ]);
                 if ($validator->fails()) {
-                    return response()->json(['status' => 401, 'message' => $validator->errors()->first(),], 401);
+                    return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 401);
                 }
             }
             ScheduleCandidate::where('schedule_request_id', $dataRequestSchedule->id)->delete();

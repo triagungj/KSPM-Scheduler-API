@@ -21,7 +21,7 @@ class CreateScheduleRequestsTable extends Migration
             $table->string('catatan_partisipan')->nullable();
             $table->string('catatan_petugas')->nullable();
             $table->string('bukti')->nullable();
-            $table->date('tanggal_validasi')->nullable();
+            $table->dateTime('tanggal_validasi')->nullable();
             $table->foreign('partisipan_id')
                 ->references('id')->on('partisipans')->onDelete('cascade')->constrained('partisipans');
             $table->foreign('petugas_id')
