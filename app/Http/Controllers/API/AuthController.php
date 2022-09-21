@@ -3,20 +3,27 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Partisipan;
+use App\Models\Petugas;
+use App\Models\ScheduleRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $validator = Validator::make()($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255|unique:users',
-            'password' => 'required|string|min:8'
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'name' => 'required|string',
+            'phone_number' => 'required|string|min:8',
+            'is_petugas' => 'required|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -24,35 +31,106 @@ class AuthController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
+            'id' => Str::uuid(),
+            'username' => $request->username,
+            'password' => Hash::make($request->password),
+            'is_petugas' => $request->is_petugas,
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        if ($request->is_superuser != null) {
+            Petugas::create([
+                'id' => Str::uuid(),
+                'username' => $request->username,
+                'name' => $request->name,
+                'phone_number' => $request->phone_number,
+                'is_superuser' => $request->is_superuser,
+            ]);
+        } else {
+            Partisipan::create([
+                'id' => Str::uuid(),
+                'username' => $request->username,
+                'name' => $request->name,
+                'phone_number' => $request->phone_number,
+                'jabatan_id' => $request->jabatan_id,
+                'member_id' => $request->member_id,
+            ]);
 
-        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer']);
+            $partisipan = Partisipan::where('username', $user->username)->firstOrFail();
+
+            ScheduleRequest::create([
+                'id' => Str::uuid(),
+                'partisipan_id' => $partisipan->id,
+            ]);
+        }
+
+        return response()->json(['status' => 200, 'message' => 'Success Registered']);
     }
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json(['message' => 'Unauthorized'], 401);
+        if (!Auth::attempt($request->only('username', 'password'))) {
+            return response()->json(['message' => 'Username/Password salah'], 401);
         }
 
-        $user = User::where('email', $request['email'])->firstOrFail();
-
+        $user = User::where('username', $request['username'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
-        return response()->json(['status' => 200, 'name' => $user->name, 'token' => $token]);
+
+        if ($user->is_petugas == true) {
+            $data =
+                Petugas::where('username', $request['username'])->firstOrFail();
+            return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'is_superuser' => $data->is_superuser, 'message' => 'Login Berhasil!', 'token' => $token]);
+        } else {
+            $data = Partisipan::where('username', $request['username'])->firstOrFail();
+            return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
+        }
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = auth()->user();
+        $validator = Validator::make($request->all(), [
+            'new_password' => 'required|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            $error = $validator->errors();
+            return response()->json([
+                'message' => $error->first('new_password')
+            ], 401,);
+        }
+        $data =
+            User::where('username', $user->username)->firstOrFail();
+
+        if (Hash::check($request->old_password, $data->password)) {
+            $data->password = Hash::make($request->new_password);
+            $data->save();
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Password berhasil diganti!'
+                ],
+            );
+        } else {
+            return response()->json(
+                [
+                    'status' => 401,
+                    'message' => 'Password lama tidak valid!'
+                ],
+                401
+            );
+        }
     }
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
-
-
+        try {
+            $request->user()->currentAccessToken()->delete();
+        } catch (\Exception $e) {
+            throw new HttpException(500, $e->getMessage());
+        }
         return [
-            'message' => 'You have successfully logged out and the token was successfully deleted'
+            'status' => 200,
+            'message' => 'Kamu telah berhasil logout!'
         ];
     }
 }

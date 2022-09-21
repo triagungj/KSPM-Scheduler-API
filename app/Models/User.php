@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -18,9 +17,10 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'id',
+        'username',
         'password',
+        'is_petugas',
     ];
 
     /**
@@ -33,12 +33,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'is_petugas' => 'boolean',
+        'id' => 'string'
     ];
+
+    public function partisipan()
+    {
+        return $this->hasOne(Partisipan::class, 'username', 'username');
+    }
+
+    public function petugas()
+    {
+        return $this->hasOne(Petugas::class, 'username', 'username');
+    }
 }

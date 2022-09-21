@@ -1,29 +1,15 @@
 <?php
 
-// namespace Database\Seeders;
+namespace Database\Seeders;
 
-// use App\Models\JabatanCategory;
-// use Illuminate\Database\Seeder;
+use App\Models\JabatanCategory;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
-// class JabatanCategorySeeder extends Seeder
-// {
-//     /**
-//      * Run the database seeds.
-//      *
-//      * @return void
-//      */
-//     public function run()
-//     {
-//         JabatanCategory::create([
-//             'name' => 'Pengurus Inti'
-//         ]);
+class JabatanCategorySeeder extends Seeder
+{
 
-//         JabatanCategory::create([
-//             'name' => 'Staff'
-//         ]);
-
-//         JabatanCategory::create([
-//             'name' => 'Anggota'
-//         ]);
-//     }
-// }
+    public function run()
+    {
+    }
+}
