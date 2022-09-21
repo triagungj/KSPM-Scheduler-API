@@ -61,6 +61,11 @@ class JabatanSeeder extends Seeder
             'name' => 'Ketua Edukasi',
             'jabatan_category_id' => $pengurusIntiUuid,
         ]);
+        Jabatan::create([
+            'id' => Str::uuid(),
+            'name' => 'Ketua PRD',
+            'jabatan_category_id' => $pengurusIntiUuid,
+        ]);
 
         $staffUuid = Str::uuid();
         JabatanCategory::create([
@@ -85,6 +90,11 @@ class JabatanSeeder extends Seeder
         Jabatan::create([
             'id' => Str::uuid(),
             'name' => 'Staff Edukasi',
+            'jabatan_category_id' => $staffUuid,
+        ]);
+        Jabatan::create([
+            'id' => Str::uuid(),
+            'name' => 'Staff PRD',
             'jabatan_category_id' => $staffUuid,
         ]);
 

@@ -5,6 +5,7 @@ use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\ScheduleRequestController;
 use App\Http\Controllers\API\SesiController;
 use App\Http\Controllers\API\FileController;
+use App\Http\Controllers\API\ScheduleController;
 use App\Http\Controllers\API\ValidationController;
 use App\Models\ScheduleRequest;
 use Illuminate\Support\Facades\Route;
@@ -40,11 +41,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 // * VALIDATION
 Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('validation/count', [
-        ValidationController::class, 'getListCount'
-    ]);
+    Route::get('validation/count', [ValidationController::class, 'getListCount']);
     Route::post('validation/list', [ValidationController::class, 'getListValidation']);
     Route::get('validation/{id}', [ValidationController::class, 'getDetailValidation']);
     Route::post('validation/reject', [ValidationController::class, 'rejectScheduleRequest']);
     Route::post('validation/accept/{id}', [ValidationController::class, 'acceptScheduleRequest']);
+});
+
+// * SCHEDULE
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('schedule', [ScheduleController::class, 'getListMySchedule']);
+    Route::get('schedule/list', [ScheduleController::class, 'getListSchedule']);
+    Route::get('schedule/session/{id}', [ScheduleController::class, 'getListDetailSchedule']);
+    Route::post('schedule/detail', [ScheduleController::class, 'getDetailSchedule']);
+    Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
 });

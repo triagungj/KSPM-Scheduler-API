@@ -7,12 +7,8 @@ use App\Models\Enum\PartisipanEnum;
 use App\Models\Enum\StatusEnum;
 use App\Models\Enum\ValidationEnum;
 use App\Models\Jabatan;
-use App\Models\Partisipan;
 use App\Models\ScheduleRequest;
-use Hamcrest\Core\IsEqual;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
 
 class ValidationController extends Controller
@@ -87,12 +83,12 @@ class ValidationController extends Controller
     {
         $user = auth()->user();
         if ($user->is_petugas) {
-            $jabatanAnggota = Jabatan::where('name', 'Anggota Magang')->firstOrFail();
-
             $request->validate([
                 'partisipan_type' => [new Enum(PartisipanEnum::class)],
                 'validation_type' => [new Enum(ValidationEnum::class)],
             ]);
+            $jabatanAnggota = Jabatan::where('name', 'Anggota Magang')->firstOrFail();
+
             $partisipanRequest = ScheduleRequest::join('partisipans', 'partisipans.id', '=', 'partisipan_id')
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id');
 

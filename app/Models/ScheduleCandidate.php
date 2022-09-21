@@ -22,7 +22,7 @@ class ScheduleCandidate extends Model
 
     public function scheduleRequest()
     {
-        $this->belongsTo(ScheduleRequest::class, 'schedule_request_id', 'id');
+        return $this->belongsTo(ScheduleRequest::class, 'schedule_request_id', 'id');
     }
 
     public function session()

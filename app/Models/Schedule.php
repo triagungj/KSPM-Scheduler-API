@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Pertemuan extends Model
+class Schedule extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'id',
-        'name'
+        'schedule_candidate_id'
     ];
+
     protected $casts = [
         'id' => 'string'
     ];
 
-    public function sesi()
+    public function scheduleCandidate()
     {
-        return $this->belongsToMany(Sesi::class);
+        return $this->hasOne(ScheduleCandidate::class, 'schedule_request_id', 'id');
     }
 }
