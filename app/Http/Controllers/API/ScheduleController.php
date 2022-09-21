@@ -28,11 +28,10 @@ class ScheduleController extends Controller
                 ->join('pertemuans', 'pertemuans.id', '=', 'sesis.pertemuan_id')
                 ->where('partisipans.id', '=', $user->partisipan->id)
                 ->get();
-            if ($user->partisipan->scheduleRequest->status != StatusEnum::Accepted) {
-                $listMySchedule = null;
-            }
+
             $data = [
                 'name' => $user->partisipan->name,
+                'schedule_status' => $user->partisipan->scheduleRequest->status,
                 'schedules' => $listMySchedule,
             ];
 
@@ -52,17 +51,19 @@ class ScheduleController extends Controller
         if (auth()) {
             $pertemuans = Pertemuan::all();
 
-            $lastUpdate = DB::table('schedules')->latest('updated_at')->first();
-
             $schedule = Schedule::first();
 
-            $data = [
-                'last_update' => $lastUpdate->updated_at,
-                'published' => $schedule != null,
-                'list_schedule' => $schedule != null
-                    ? $pertemuans
-                    : null,
-            ];
+            $lastUpdate = DB::table('schedules')->latest('updated_at')->first();
+
+            if ($schedule == null) {
+                $data = null;
+            } else {
+                $data = [
+                    'last_update' => $lastUpdate->updated_at,
+                    'published' => true,
+                    'list_schedule' => $pertemuans,
+                ];
+            }
 
             return
                 response()->json(
