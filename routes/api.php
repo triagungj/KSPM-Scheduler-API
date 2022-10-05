@@ -61,18 +61,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 
 
-// * ADMIN AUTH
-Route::post('admin/login', [AdminAuthController::class, 'loginAdmin']);
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::post('admin/logout', [AdminAuthController::class, 'logoutAdmin']);
-});
+// // * ADMIN AUTH
+// Route::post('admin/login', [AdminAuthController::class, 'loginAdmin']);
+// Route::group(['middleware' => ['auth:sanctum']], function () {
+//     Route::post('admin/logout', [AdminAuthController::class, 'logoutAdmin']);
+// });
 
-// * ADMIN NEWS
-// * NEWS
-Route::group(['middleware' => ['auth:sanctum']], function () {
-    Route::get('admin/news', [NewsController::class, 'index']);
-    Route::get('admin/news/{id}', [NewsController::class, 'detail']);
-    Route::post('admin/news', [NewsController::class, 'create']);
-    Route::put('admin/news', [NewsController::class, 'update']);
-    Route::delete('admin/news/{id}', [NewsController::class, 'delete']);
-});
+// // * ADMIN NEWS
+// // * NEWS
+// Route::group(['middleware' => ['auth:sanctum']], function () {
+//     Route::get('admin/news', [NewsController::class, 'index']);
+//     Route::get('admin/news/{id}', [NewsController::class, 'detail']);
+//     Route::post('admin/news', [NewsController::class, 'create']);
+//     Route::put('admin/news', [NewsController::class, 'update']);
+//     Route::delete('admin/news/{id}', [NewsController::class, 'delete']);
+// });

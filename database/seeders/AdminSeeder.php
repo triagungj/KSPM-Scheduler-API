@@ -14,7 +14,7 @@ class AdminSeeder extends Seeder
     {
         Admin::create([
             'id' => Str::uuid(),
-            'username' => 'triagungj',
+            'username' => 'triagungjr',
             'password' => Hash::make('12345678'),
             'phone_number' => '6282327495261',
         ]);

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Admin;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class NewsController extends Controller
@@ -46,6 +47,13 @@ class NewsController extends Controller
         $admin = Admin::where('username', $user->username)->firstOrFail();
 
         if($admin){
+             $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
+            }
             News::create([
                 'id' => Str::uuid(),
                 'title' => $request->title,
@@ -68,6 +76,13 @@ class NewsController extends Controller
         $admin = Admin::where('username', $user->username)->firstOrFail();
 
         if($admin){
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
+            }
             $news = News::where('id', $request->id)->firstOrFail();
             $news->title = $request->title;
             $news->description = $request->description;

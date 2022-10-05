@@ -8,7 +8,6 @@ use App\Models\Petugas;
 use App\Models\ScheduleRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -16,6 +15,7 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+        
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -68,21 +68,23 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        if (!Auth::attempt($request->only('username', 'password'))) {
-            return response()->json(['message' => 'Username/Password salah'], 401);
+        if(auth()->guard('user')->attempt(['username' => $request->input('username'),  'password' => $request->input('password')])){
+            $user = auth()->guard('user')->user();
+            $admin = User::where('username', $user->username)->firstOrFail();
+            $token = $admin->createToken('auth_token')->plainTextToken;
+            if ($user->is_petugas == true) {
+            $data = Petugas::where('username', $request['username'])->firstOrFail();
+                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'is_superuser' => $data->is_superuser, 'message' => 'Login Berhasil!', 'token' => $token]);
+            } else {
+                $data = Partisipan::where('username', $request['username'])->firstOrFail();
+                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
+            }
+       
+        }else {
+            return response()->json(['status' => 401, 'message' => 'Username/Password salah']);
         }
 
-        $user = User::where('username', $request['username'])->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        if ($user->is_petugas == true) {
-            $data =
-                Petugas::where('username', $request['username'])->firstOrFail();
-            return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'is_superuser' => $data->is_superuser, 'message' => 'Login Berhasil!', 'token' => $token]);
-        } else {
-            $data = Partisipan::where('username', $request['username'])->firstOrFail();
-            return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
-        }
+        
     }
 
     public function changePassword(Request $request)
