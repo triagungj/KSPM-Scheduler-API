@@ -65,35 +65,35 @@ class UserSeeder extends Seeder
 
     public function run()
     {
-        User::create([
-            'id' => Str::uuid(),
-            'username' => 'triagungj',
-            'password' => Hash::make('12345678'),
-            'is_petugas' => true,
-        ]);
+        // User::create([
+        //     'id' => Str::uuid(),
+        //     'username' => 'triagungj',
+        //     'password' => Hash::make('12345678'),
+        //     'is_petugas' => true,
+        // ]);
 
-        Petugas::create([
-            'id' => Str::uuid(),
-            'username' => 'triagungj',
-            'name' => 'Tri Agung J',
-            'phone_number' => '6282327495261',
-            'is_superuser' => true,
-        ]);
+        // Petugas::create([
+        //     'id' => Str::uuid(),
+        //     'username' => 'triagungj',
+        //     'name' => 'Tri Agung J',
+        //     'phone_number' => '6282327495261',
+        //     'is_superuser' => true,
+        // ]);
 
-        User::create([
-            'id' => Str::uuid(),
-            'username' => 'validator',
-            'password' => Hash::make('12345678'),
-            'is_petugas' => true,
-        ]);
+        // User::create([
+        //     'id' => Str::uuid(),
+        //     'username' => 'validator',
+        //     'password' => Hash::make('12345678'),
+        //     'is_petugas' => true,
+        // ]);
 
-        Petugas::create([
-            'id' => Str::uuid(),
-            'username' => 'validator',
-            'name' => 'User Validator',
-            'phone_number' => '6282327495261',
-            'is_superuser' => false,
-        ]);
+        // Petugas::create([
+        //     'id' => Str::uuid(),
+        //     'username' => 'validator',
+        //     'name' => 'User Validator',
+        //     'phone_number' => '6282327495261',
+        //     'is_superuser' => false,
+        // ]);
 
         $userUuid = Str::uuid();
         User::create([

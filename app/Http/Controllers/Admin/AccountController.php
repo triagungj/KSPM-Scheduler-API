@@ -213,6 +213,7 @@ class AccountController extends Controller
         if ($data) {
             $partisipan = Partisipan::where('id', $id)->first();
             $partisipan->user->delete();
+            $partisipan->delete();
             return response()->json(
                 [
                     'status' => 200,
@@ -229,6 +230,7 @@ class AccountController extends Controller
         $data =
             Admin::where('username', $user->username)->first();
         if ($data) {
+            Partisipan::where('id', 'like', '%%')->delete();
             User::where('is_petugas', '=', false)->delete();
 
             return response()->json(
