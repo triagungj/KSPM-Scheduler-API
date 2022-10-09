@@ -14,15 +14,11 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AdminAuthController extends Controller
 {    
-    public function getLogin(){
-        return response()->json(['message' => 'Username/Password kontol'], 401);
-
-    }
     public function loginAdmin(Request $request){
         
         if(auth()->guard('admin')->attempt(['username' => $request->input('username'),  'password' => $request->input('password')])){
             $user = auth()->guard('admin')->user();
-            $admin = Admin::where('username', $user->username)->firstOrFail();
+            $admin = Admin::where('username', $user->username)->first();
             $token = $admin->createToken('auth_token')->plainTextToken;
             return response()->json(['status' => 200, 'message' => 'Login Success', 'token' => $token]);
        
@@ -33,7 +29,7 @@ class AdminAuthController extends Controller
 
     public function getProfileAdmin(){
         $user = auth()->user();
-        $admin = Admin::where('username', $user->username)->firstOrFail();
+        $admin = Admin::where('username', $user->username)->first();
         if($admin){
             return response()->json(['status' => 200, 'data' => $admin]);
         }else{
@@ -44,7 +40,7 @@ class AdminAuthController extends Controller
     public function updateAdmin(Request $request)
     {
         $user = auth()->user();
-        $admin = Admin::where('id', $user->id)->firstOrFail();
+        $admin = Admin::where('id', $user->id)->first();
         if ($admin) {
              $validator = Validator::make($request->all(), [
                 'username' => 'required|string|max:255|min:8',
@@ -84,7 +80,17 @@ class AdminAuthController extends Controller
             ], 401,);
         }
         $data =
-            Admin::where('username', $user->username)->firstOrFail();
+            Admin::where('username', $user->username)->first();
+        if(!$data){
+            return response()->json(
+                [
+                    'status' => 401,
+                    'message' => 'Unauthorized'
+                ],
+                401
+            );
+        }
+        
 
         if (Hash::check($request->old_password, $data->password)) {
             $data->password = Hash::make($request->new_password);
@@ -98,10 +104,10 @@ class AdminAuthController extends Controller
         } else {
             return response()->json(
                 [
-                    'status' => 401,
+                    'status' => 403,
                     'message' => 'Password lama tidak valid!'
                 ],
-                401
+                403
             );
         }
     }

@@ -21,7 +21,7 @@ class Partisipan extends Model
 
     public function user()
     {
-        $this->belongsTo(User::class, 'username', 'username');
+        return $this->belongsTo(User::class, 'username', 'username');
     }
 
     public function jabatan()

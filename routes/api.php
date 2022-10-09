@@ -13,7 +13,7 @@ use App\Models\ScheduleRequest;
 use Illuminate\Support\Facades\Route;
 
 // * AUTH
-Route::post('auth/register', [AuthController::class, 'register']);
+// Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('auth/change-password', [AuthController::class, 'changePassword']);

@@ -11,43 +11,45 @@ use Illuminate\Support\Str;
 
 class NewsController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $user = auth()->user();
 
-        if($user){
+        if ($user) {
             $newsList = News::orderBy('created_at', 'desc')->paginate(5);
             return response()->json(
-                    [
-                        'status' => 200,
-                        'data' => $newsList,
-                    ],
-                );
+                [
+                    'status' => 200,
+                    'data' => $newsList,
+                ],
+            );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-    public function detail($id){
+    public function detail($id)
+    {
         $user = auth()->user();
 
-        if($user){
+        if ($user) {
             $detailNews = News::where('id', $id)->firstOrFail();
             return response()->json(
-                    [
-                        'status' => 200,
-                        'data' => $detailNews,
-                    ],
-                );
+                [
+                    'status' => 200,
+                    'data' => $detailNews,
+                ],
+            );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-    public function create(Request $request){
+    public function create(Request $request)
+    {
         $user = auth()->user();
+        $admin = Admin::where('username', $user->username)->first();
 
-        $admin = Admin::where('username', $user->username)->firstOrFail();
-
-        if($admin){
-             $validator = Validator::make($request->all(), [
+        if ($admin) {
+            $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
             ]);
@@ -60,22 +62,22 @@ class NewsController extends Controller
                 'description' => $request->description,
             ]);
             return response()->json(
-                    [
-                        'status' => 200,
-                        'message' => 'Success!',
-                    ],
-                );
+                [
+                    'status' => 200,
+                    'message' => 'Success!',
+                ],
+            );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
 
-    public function update(Request $request){
+    public function update(Request $request)
+    {
         $user = auth()->user();
+        $admin = Admin::where('username', $user->username)->first();
 
-        $admin = Admin::where('username', $user->username)->firstOrFail();
-
-        if($admin){
+        if ($admin) {
             $validator = Validator::make($request->all(), [
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
@@ -88,28 +90,28 @@ class NewsController extends Controller
             $news->description = $request->description;
             $news->save();
             return response()->json(
-                    [
-                        'status' => 200,
-                        'message' => 'Success!',
-                    ],
-                );
+                [
+                    'status' => 200,
+                    'message' => 'Success!',
+                ],
+            );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-    public function delete($id){
+    public function delete($id)
+    {
         $user = auth()->user();
+        $admin = Admin::where('username', $user->username)->first();
 
-        $admin = Admin::where('username', $user->username)->firstOrFail();
-
-        if($admin){
+        if ($admin) {
             News::where('id', $id)->delete();
             return response()->json(
-                    [
-                        'status' => 200,
-                        'message' => 'Delete Success!',
-                    ],
-                );
+                [
+                    'status' => 200,
+                    'message' => 'Delete Success!',
+                ],
+            );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
