@@ -243,4 +243,167 @@ class AccountController extends Controller
             return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
         }
     }
+    public function getListPetugas()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+        if ($admin) {
+            $petugas = Petugas::orderBy('created_at', 'desc')->get();
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'data' => $petugas,
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+    public function getPetugas($id)
+    {
+        $user = auth()->user();
+        $data =
+            Admin::where('username', $user->username)->first();
+        if ($data) {
+            $petugas = Petugas::where('id', $id)->first();
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'data' => $petugas,
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+    public function updatePetugas(Request $request, $id)
+    {
+        $auth = auth()->user();
+        $admin =
+            Admin::where('username', $auth->username)->first();
+        if ($admin) {
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|string|max:255|min:8|alpha_dash|unique:petugas,username,' . $id,
+                'name' => 'required|string|max:255',
+                'password' => $request->password != ''
+                    ? 'required|string|min:8'
+                    : '',
+                'phone_number' => 'required|string|min:8',
+                'super_user' => 'required|boolean',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['message' => $validator->errors()->first()], 400);
+            }
+
+            $petugas = Petugas::where('id', $id)->firstOrFail();
+            $petugasUser = $petugas->user;
+
+            if ($petugasUser->username != $request->username) {
+                $petugasUser->username = $request->username;
+            }
+            if ($request->password != '') {
+                $petugasUser->password = Hash::make($request->password);
+            }
+            $petugasUser->save();
+
+            $petugas->name = $request->name;
+            $petugas->phone_number = $request->phone_number;
+            $petugas->is_superuser = $request->super_user;
+            if ($petugas->save()) {
+                return response()->json(
+                    [
+                        'status' => 200,
+                        'message' => 'Akun Petugas berhasil diedit',
+                    ],
+                );
+            }
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+    public function createPetugas(Request $request)
+    {
+        $auth = auth()->user();
+        $admin =
+            Admin::where('username', $auth->username)->first();
+        if ($admin) {
+            $validator = Validator::make($request->all(), [
+                'username' => 'required|string|max:255|alpha_dash|unique:users',
+                'password' => 'required|string|min:8',
+                'name' => 'required|string',
+                'phone_number' => 'required|string|min:8',
+                'super_user' => 'required|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['message' => $validator->errors()->first()], 400);
+            }
+
+            User::create([
+                'id' => Str::uuid(),
+                'username' => $request->username,
+                'password' => Hash::make($request->password),
+                'is_petugas' => true,
+            ]);
+
+            Petugas::create([
+                'id' => Str::uuid(),
+                'username' => $request->username,
+                'name' => $request->name,
+                'phone_number' => $request->phone_number,
+                'is_superuser' => $request->super_user,
+            ]);
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Akun Petugas berhasil dibuat',
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+    public function deletePetugas($id)
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+        if ($admin) {
+            $petugas = Petugas::where('id', $id)->first();
+            $petugas->user->delete();
+            $petugas->delete();
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Delete Success!',
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+    public function deleteAllPetugas()
+    {
+        $user = auth()->user();
+        $data =
+            Admin::where('username', $user->username)->first();
+        if ($data) {
+            Petugas::where('id', 'like', '%%')->delete();
+            User::where('is_petugas', '=', true)->delete();
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Delete Success!',
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
 }

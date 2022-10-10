@@ -27,6 +27,16 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::delete('account/partisipan/{id}', [AccountController::class, 'deletePartisipan']);
     Route::delete('account/partisipans', [AccountController::class, 'deleteAllPartisipan']);
 
+    Route::get('account/petugas', [
+        AccountController::class,
+        'getListPetugas'
+    ]);
+    Route::post('account/petugas', [AccountController::class, 'createPetugas']);
+    Route::get('account/petugas/{id}', [AccountController::class, 'getPetugas']);
+    Route::put('account/petugas/{id}', [AccountController::class, 'updatePetugas']);
+    Route::delete('account/petugas/{id}', [AccountController::class, 'deletePetugas']);
+    Route::delete('account/petugas', [AccountController::class, 'deleteAllPetugas']);
+
     Route::get('news', [NewsController::class, 'index']);
     Route::get('news/{id}', [NewsController::class, 'detail']);
     Route::post('news', [NewsController::class, 'create']);

@@ -19,6 +19,8 @@ class CreatePetugasTable extends Migration
             $table->string('name');
             $table->string('phone_number');
             $table->boolean('is_superuser')->default(false);
+            $table->foreign('username')
+                ->references('username')->on('users')->onDelete('cascade')->onUpdate('cascade')->constrained('users');
             $table->timestamps();
         });
     }
