@@ -183,6 +183,7 @@ class AccountController extends Controller
 
             if ($partisipanUser->username != $request->username) {
                 $partisipanUser->username = $request->username;
+                $partisipan->username = $request->username;
             }
             if ($request->password != '') {
                 $partisipanUser->password = Hash::make($request->password);
@@ -304,6 +305,7 @@ class AccountController extends Controller
 
             if ($petugasUser->username != $request->username) {
                 $petugasUser->username = $request->username;
+                $petugas->username = $request->username;
             }
             if ($request->password != '') {
                 $petugasUser->password = Hash::make($request->password);
