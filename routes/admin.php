@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\JabatanController;
 use App\Http\Controllers\API\NewsController;
+use App\Http\Controllers\API\ScheduleController;
+use App\Http\Controllers\API\ValidationController;
 use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function () {
@@ -42,6 +44,9 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::post('news', [NewsController::class, 'create']);
     Route::put('news', [NewsController::class, 'update']);
     Route::delete('news/{id}', [NewsController::class, 'delete']);
+
+    Route::get('schedule', [ScheduleController::class, 'getAllSchedule']);
+    Route::get('schedule/count', [ValidationController::class, 'getListCount']);
 
     Route::get('jabatans', [JabatanController::class, 'index']);
 });

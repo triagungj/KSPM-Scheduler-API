@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Enum\PartisipanEnum;
 use App\Models\Enum\StatusEnum;
 use App\Models\Pertemuan;
@@ -166,8 +167,10 @@ class ScheduleController extends Controller
     public function generateSchedule()
     {
         $user = auth()->user();
-        $isSuperUser = $user->petugas->is_superuser;
-        if ($isSuperUser) {
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($user->petugas->is_superuser || $admin) {
             $population = 2;
 
             Schedule::truncate();
@@ -282,6 +285,80 @@ class ScheduleController extends Controller
                         'data' => $temp,
                     ],
                 );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function getAllSchedule()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin || $user->petugas->is_superuser) {
+            $result = [];
+            $detailResult = [];
+            $collection = DB::table('sesis')
+                ->selectRaw('count(id) as total, hari')
+                ->groupBy('hari')
+                ->get();
+            foreach ($collection as $data) {
+                $listSesi = Sesi::where('hari', $data->hari)->get();
+                $listDetailSesi = [];
+                foreach ($listSesi as $sesi) {
+                    $pengurus = [];
+                    $anggota = [];
+                    $listPengurus =
+                        DB::table('schedules')
+                        ->select(['partisipans.name'])
+                        ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
+                        ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
+                        ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
+                        ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
+                        ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                        ->where('sesis.id', '=', $sesi->id)
+                        ->where('jabatans.name', '!=', 'Anggota Magang')
+                        ->get();
+                    $listAnggota =
+                        DB::table('schedules')
+                        ->select(['partisipans.name'])
+                        ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
+                        ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
+                        ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
+                        ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
+                        ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                        ->where('sesis.id', '=', $sesi->id)
+                        ->where('jabatans.name', '=', 'Anggota Magang')
+                        ->get();
+
+                    foreach ($listPengurus as $dataPartisipan) {
+                        array_push($pengurus, $dataPartisipan->name);
+                    }
+                    foreach ($listAnggota as $dataAnggota) {
+                        array_push($anggota, $dataAnggota->name);
+                    }
+                    $detailSesi = [
+                        'name' => $sesi->name,
+                        'waktu' => $sesi->waktu,
+                        'pengurus' => $pengurus,
+                        'anggota' => $anggota
+                    ];
+                    array_push($listDetailSesi, $detailSesi);
+                }
+                $detailResult = [
+                    'hari' => $data->hari,
+                    'list_sesi' => $listDetailSesi,
+                ];
+                array_push($result, $detailResult);
+            }
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'data' => $result,
+                ],
+            );
         } else {
             return response()->json(['message' => 'Tidak memiliki akses'], 401);
         }
