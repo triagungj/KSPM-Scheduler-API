@@ -47,6 +47,8 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
 
     Route::get('schedule', [ScheduleController::class, 'getAllSchedule']);
     Route::get('schedule/count', [ValidationController::class, 'getListCount']);
+    Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
+    Route::get('schedule/reset', [ScheduleController::class, 'resetSchedule']);
 
     Route::get('jabatans', [JabatanController::class, 'index']);
 });

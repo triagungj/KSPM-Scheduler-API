@@ -8,6 +8,7 @@ use App\Models\Enum\PartisipanEnum;
 use App\Models\Enum\StatusEnum;
 use App\Models\Pertemuan;
 use App\Models\Schedule;
+use App\Models\ScheduleCandidate;
 use App\Models\Sesi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -170,7 +171,7 @@ class ScheduleController extends Controller
         $admin =
             Admin::where('username', $user->username)->first();
 
-        if ($user->petugas->is_superuser || $admin) {
+        if ($admin || $user->petugas->is_superuser) {
             $population = 2;
 
             Schedule::truncate();
@@ -282,7 +283,7 @@ class ScheduleController extends Controller
                         'status' => 200,
                         'message' => 'Berhasil Mengatur Ulang Jadwal',
                         'total' => count($individu),
-                        'data' => $temp,
+                        // 'data' => $temp,
                     ],
                 );
         } else {
@@ -299,6 +300,8 @@ class ScheduleController extends Controller
         if ($admin || $user->petugas->is_superuser) {
             $result = [];
             $detailResult = [];
+
+            $lastUpdate = DB::table('schedules')->latest('updated_at')->first();
             $collection = DB::table('sesis')
                 ->selectRaw('count(id) as total, hari')
                 ->groupBy('hari')
@@ -356,7 +359,31 @@ class ScheduleController extends Controller
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $result,
+                    'last_update' => $lastUpdate != null ? $lastUpdate->updated_at . 'Z' : null,
+                    'data' => $lastUpdate != null ?  $result : [],
+                ],
+            );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function resetSchedule()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin) {
+            ScheduleCandidate::where('id', 'like', '%%')->delete();
+            DB::table('schedule_requests')
+                ->update(['status' => null]);
+
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => "Berhasil mengatur ulang periode!"
                 ],
             );
         } else {
