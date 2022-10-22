@@ -30,8 +30,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('profile/edit', [ProfileController::class, 'edit']);
 });
 
-// * SESSION
-
 // * SCHEDULE REQUEST
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('request/session', [ScheduleRequestController::class, 'getListSession']);
@@ -59,20 +57,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
 });
 
-
-
-// // * ADMIN AUTH
-// Route::post('admin/login', [AdminAuthController::class, 'loginAdmin']);
-// Route::group(['middleware' => ['auth:sanctum']], function () {
-//     Route::post('admin/logout', [AdminAuthController::class, 'logoutAdmin']);
-// });
-
-// // * ADMIN NEWS
-// // * NEWS
-// Route::group(['middleware' => ['auth:sanctum']], function () {
-//     Route::get('admin/news', [NewsController::class, 'index']);
-//     Route::get('admin/news/{id}', [NewsController::class, 'detail']);
-//     Route::post('admin/news', [NewsController::class, 'create']);
-//     Route::put('admin/news', [NewsController::class, 'update']);
-//     Route::delete('admin/news/{id}', [NewsController::class, 'delete']);
-// });
+// * NEWS
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('news', [NewsController::class, 'index']);
+    Route::get('news/{id}', [NewsController::class, 'detail']);
+});

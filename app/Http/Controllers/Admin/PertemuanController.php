@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
-use App\Models\Jabatan;
+use App\Models\Pertemuan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
-class JabatanController extends Controller
+class PertemuanController extends Controller
 {
+
     public function index()
     {
         $user = auth()->user();
@@ -18,12 +19,11 @@ class JabatanController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($data) {
-            $jabatans = Jabatan::select('jabatans.*', 'jabatan_categories.name as jabatan_category')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')->get();
+            $pertemuan = Pertemuan::orderBy('name', 'asc')->get();
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $jabatans,
+                    'data' => $pertemuan,
                 ],
             );
         } else {
@@ -37,11 +37,11 @@ class JabatanController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
-            $jabatan = Jabatan::where('id', $id)->first();
+            $pertemuan = Pertemuan::where('id', $id)->first();
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $jabatan,
+                    'data' => $pertemuan,
                 ],
             );
         } else {
@@ -56,21 +56,19 @@ class JabatanController extends Controller
 
         if ($admin) {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255|unique:jabatans',
-                'jabatan_category_id' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
             ]);
             if ($validator->fails()) {
                 return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
             }
-            Jabatan::create([
+            Pertemuan::create([
                 'id' => Str::uuid(),
                 'name' => $request->name,
-                'jabatan_category_id' => $request->jabatan_category_id
             ]);
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil menambah Jabatan!',
+                    'message' => 'Berhasil menambah Pertemuan!',
                 ],
             );
         } else {
@@ -86,20 +84,18 @@ class JabatanController extends Controller
         if ($admin) {
             $validator = Validator::make($request->all(), [
                 'id' => 'required|string|max:255',
-                'name' => 'required|string|max:255|unique:jabatans,name,' . $request->id,
-                'jabatan_category_id' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
             ]);
             if ($validator->fails()) {
                 return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
             }
-            $jabatan = Jabatan::where('id', $request->id)->firstOrFail();
-            $jabatan->name = $request->name;
-            $jabatan->jabatan_category_id = $request->jabatan_category_id;
-            $jabatan->save();
+            $pertemuan = Pertemuan::where('id', $request->id)->firstOrFail();
+            $pertemuan->name = $request->name;
+            $pertemuan->save();
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil mengubah Jabatan!',
+                    'message' => 'Berhasil mengubah pertemuan!',
                 ],
             );
         } else {
@@ -113,11 +109,11 @@ class JabatanController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
-            Jabatan::where('id', $id)->delete();
+            Pertemuan::where('id', $id)->delete();
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil menghapus Jabatan',
+                    'message' => 'Berhasil menghapus Pertemuan',
                 ],
             );
         } else {

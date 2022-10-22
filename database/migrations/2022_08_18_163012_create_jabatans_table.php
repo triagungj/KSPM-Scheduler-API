@@ -16,7 +16,7 @@ class CreateJabatansTable extends Migration
         Schema::create('jabatans', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('jabatan_category_id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->foreign('jabatan_category_id')
                 ->references('id')->on('jabatan_categories')->onDelete('cascade')->constrained('jabatan_categories');
             $table->timestamps();

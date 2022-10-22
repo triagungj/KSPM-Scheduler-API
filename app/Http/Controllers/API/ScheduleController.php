@@ -51,7 +51,7 @@ class ScheduleController extends Controller
     public function getListSchedule()
     {
         if (auth()) {
-            $pertemuans = Pertemuan::all();
+            $pertemuans = Pertemuan::orderBy('name', 'asc')->get();
 
             $schedule = Schedule::first();
 
@@ -188,7 +188,7 @@ class ScheduleController extends Controller
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
                 ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
                 ->where('jabatan_categories.name', '=', 'Anggota')
-                ->get();
+                ->get();                                                                                                                                
 
             $individu = [];
 
@@ -251,7 +251,7 @@ class ScheduleController extends Controller
                     }
                 }
 
-                $fitness = (float) $fitnessTotal / count($sesis);
+                $fitness = $fitnessTotal != null ? (float) $fitnessTotal / count($sesis) : null;
 
                 array_push($individu, [
                     'fitness' => $fitness,
@@ -377,7 +377,7 @@ class ScheduleController extends Controller
         if ($admin) {
             ScheduleCandidate::where('id', 'like', '%%')->delete();
             DB::table('schedule_requests')
-                ->update(['status' => null]);
+                ->update(['status' => null, 'bukti' => null, 'petugas_id' => null]);
 
 
             return response()->json(

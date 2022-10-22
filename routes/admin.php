@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\Admin\AccountController;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Admin\JabatanCategoryController;
 use App\Http\Controllers\Admin\JabatanController;
+use App\Http\Controllers\Admin\PertemuanController;
 use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\ScheduleController;
+use App\Http\Controllers\Admin\SesiController;
 use App\Http\Controllers\API\ValidationController;
 use Illuminate\Support\Facades\Route;
 
@@ -50,5 +53,27 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
     Route::get('schedule/reset', [ScheduleController::class, 'resetSchedule']);
 
-    Route::get('jabatans', [JabatanController::class, 'index']);
+    Route::get('master/pertemuan', [PertemuanController::class, 'index']);
+    Route::get('master/pertemuan/{id}', [PertemuanController::class, 'get']);
+    Route::post('master/pertemuan', [PertemuanController::class, 'create']);
+    Route::put('master/pertemuan', [PertemuanController::class, 'update']);
+    Route::delete('master/pertemuan/{id}', [PertemuanController::class, 'delete']);
+
+    Route::get('master/sesi', [SesiController::class, 'index']);
+    Route::get('master/sesi/{id}', [SesiController::class, 'get']);
+    Route::post('master/sesi', [SesiController::class, 'create']);
+    Route::put('master/sesi', [SesiController::class, 'update']);
+    Route::delete('master/sesi/{id}', [SesiController::class, 'delete']);
+
+    Route::get('master/jabatan', [JabatanController::class, 'index']);
+    Route::get('master/jabatan/{id}', [JabatanController::class, 'get']);
+    Route::post('master/jabatan', [JabatanController::class, 'create']);
+    Route::put('master/jabatan', [JabatanController::class, 'update']);
+    Route::delete('master/jabatan/{id}', [JabatanController::class, 'delete']);
+
+    Route::get('master/jabatan-category', [JabatanCategoryController::class, 'index']);
+    Route::get('master/jabatan-category/{id}', [JabatanCategoryController::class, 'get']);
+    Route::post('master/jabatan-category', [JabatanCategoryController::class, 'create']);
+    Route::put('master/jabatan-category', [JabatanCategoryController::class, 'update']);
+    Route::delete('master/jabatan-category/{id}', [JabatanCategoryController::class, 'delete']);
 });

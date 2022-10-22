@@ -4,26 +4,28 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
-use App\Models\Jabatan;
+use App\Models\Enum\DayEnum;
+use App\Models\Sesi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Enum;
 
-class JabatanController extends Controller
+class SesiController extends Controller
 {
     public function index()
     {
         $user = auth()->user();
-        $data =
+        $admin =
             Admin::where('username', $user->username)->first();
 
-        if ($data) {
-            $jabatans = Jabatan::select('jabatans.*', 'jabatan_categories.name as jabatan_category')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')->get();
+        if ($admin) {
+            $sesiList = Sesi::select('sesis.*', 'pertemuans.name as pertemuan')
+                ->join('pertemuans', 'pertemuans.id', '=', 'sesis.pertemuan_id')
+                ->orderBy('id', 'asc')->paginate(10);
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $jabatans,
+                    'data' => $sesiList,
                 ],
             );
         } else {
@@ -37,18 +39,17 @@ class JabatanController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
-            $jabatan = Jabatan::where('id', $id)->first();
+            $sesi = Sesi::where('id', $id)->first();
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $jabatan,
+                    'data' => $sesi,
                 ],
             );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-
     public function create(Request $request)
     {
         $user = auth()->user();
@@ -56,28 +57,30 @@ class JabatanController extends Controller
 
         if ($admin) {
             $validator = Validator::make($request->all(), [
-                'name' => 'required|string|max:255|unique:jabatans',
-                'jabatan_category_id' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'hari' => [new Enum(DayEnum::class)],
+                'waktu' => 'required|string|max:255',
+                'pertemuan_id' => 'required|string|max:255',
             ]);
             if ($validator->fails()) {
                 return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
             }
-            Jabatan::create([
-                'id' => Str::uuid(),
+            Sesi::create([
                 'name' => $request->name,
-                'jabatan_category_id' => $request->jabatan_category_id
+                'pertemuan_id' => $request->pertemuan_id,
+                'hari' => $request->hari,
+                'waktu' => $request->waktu,
             ]);
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil menambah Jabatan!',
+                    'message' => 'Berhasil menambah Sesi!',
                 ],
             );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
-
     public function update(Request $request)
     {
         $user = auth()->user();
@@ -85,27 +88,32 @@ class JabatanController extends Controller
 
         if ($admin) {
             $validator = Validator::make($request->all(), [
-                'id' => 'required|string|max:255',
-                'name' => 'required|string|max:255|unique:jabatans,name,' . $request->id,
-                'jabatan_category_id' => 'required|string|max:255',
+                'id' => 'required|int',
+                'name' => 'required|string|max:255',
+                'hari' => [new Enum(DayEnum::class)],
+                'waktu' => 'required|string|max:255',
+                'pertemuan_id' => 'required|string|max:255',
             ]);
             if ($validator->fails()) {
                 return response()->json(['status' => 400, 'message' => $validator->errors()->first(),], 400);
             }
-            $jabatan = Jabatan::where('id', $request->id)->firstOrFail();
-            $jabatan->name = $request->name;
-            $jabatan->jabatan_category_id = $request->jabatan_category_id;
-            $jabatan->save();
+            $sesi = Sesi::where('id', $request->id)->firstOrFail();
+            $sesi->name = $request->name;
+            $sesi->hari = $request->hari;
+            $sesi->waktu = $request->waktu;
+            $sesi->pertemuan_id = $request->pertemuan_id;
+            $sesi->save();
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil mengubah Jabatan!',
+                    'message' => 'Success!',
                 ],
             );
         } else {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
     }
+
     public function delete($id)
     {
         $user = auth()->user();
@@ -113,11 +121,11 @@ class JabatanController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
-            Jabatan::where('id', $id)->delete();
+            Sesi::where('id', $id)->delete();
             return response()->json(
                 [
                     'status' => 200,
-                    'message' => 'Berhasil menghapus Jabatan',
+                    'message' => 'Berhasil menghapus Sesi',
                 ],
             );
         } else {
