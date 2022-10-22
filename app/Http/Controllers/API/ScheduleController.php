@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Enum\PartisipanEnum;
 use App\Models\Enum\StatusEnum;
 use App\Models\Pertemuan;
 use App\Models\Schedule;
+use App\Models\ScheduleCandidate;
 use App\Models\Sesi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -49,7 +51,7 @@ class ScheduleController extends Controller
     public function getListSchedule()
     {
         if (auth()) {
-            $pertemuans = Pertemuan::all();
+            $pertemuans = Pertemuan::orderBy('name', 'asc')->get();
 
             $schedule = Schedule::first();
 
@@ -166,8 +168,10 @@ class ScheduleController extends Controller
     public function generateSchedule()
     {
         $user = auth()->user();
-        $isSuperUser = $user->petugas->is_superuser;
-        if ($isSuperUser) {
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin || $user->petugas->is_superuser) {
             $population = 2;
 
             Schedule::truncate();
@@ -184,7 +188,7 @@ class ScheduleController extends Controller
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
                 ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
                 ->where('jabatan_categories.name', '=', 'Anggota')
-                ->get();
+                ->get();                                                                                                                                
 
             $individu = [];
 
@@ -247,7 +251,7 @@ class ScheduleController extends Controller
                     }
                 }
 
-                $fitness = (float) $fitnessTotal / count($sesis);
+                $fitness = $fitnessTotal != null ? (float) $fitnessTotal / count($sesis) : null;
 
                 array_push($individu, [
                     'fitness' => $fitness,
@@ -279,9 +283,109 @@ class ScheduleController extends Controller
                         'status' => 200,
                         'message' => 'Berhasil Mengatur Ulang Jadwal',
                         'total' => count($individu),
-                        'data' => $temp,
+                        // 'data' => $temp,
                     ],
                 );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function getAllSchedule()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin || $user->petugas->is_superuser) {
+            $result = [];
+            $detailResult = [];
+
+            $lastUpdate = DB::table('schedules')->latest('updated_at')->first();
+            $collection = DB::table('sesis')
+                ->selectRaw('count(id) as total, hari')
+                ->groupBy('hari')
+                ->get();
+            foreach ($collection as $data) {
+                $listSesi = Sesi::where('hari', $data->hari)->get();
+                $listDetailSesi = [];
+                foreach ($listSesi as $sesi) {
+                    $pengurus = [];
+                    $anggota = [];
+                    $listPengurus =
+                        DB::table('schedules')
+                        ->select(['partisipans.name'])
+                        ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
+                        ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
+                        ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
+                        ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
+                        ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                        ->where('sesis.id', '=', $sesi->id)
+                        ->where('jabatans.name', '!=', 'Anggota Magang')
+                        ->get();
+                    $listAnggota =
+                        DB::table('schedules')
+                        ->select(['partisipans.name'])
+                        ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
+                        ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
+                        ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
+                        ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
+                        ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                        ->where('sesis.id', '=', $sesi->id)
+                        ->where('jabatans.name', '=', 'Anggota Magang')
+                        ->get();
+
+                    foreach ($listPengurus as $dataPartisipan) {
+                        array_push($pengurus, $dataPartisipan->name);
+                    }
+                    foreach ($listAnggota as $dataAnggota) {
+                        array_push($anggota, $dataAnggota->name);
+                    }
+                    $detailSesi = [
+                        'name' => $sesi->name,
+                        'waktu' => $sesi->waktu,
+                        'pengurus' => $pengurus,
+                        'anggota' => $anggota
+                    ];
+                    array_push($listDetailSesi, $detailSesi);
+                }
+                $detailResult = [
+                    'hari' => $data->hari,
+                    'list_sesi' => $listDetailSesi,
+                ];
+                array_push($result, $detailResult);
+            }
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'last_update' => $lastUpdate != null ? $lastUpdate->updated_at . 'Z' : null,
+                    'data' => $lastUpdate != null ?  $result : [],
+                ],
+            );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function resetSchedule()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin) {
+            ScheduleCandidate::where('id', 'like', '%%')->delete();
+            DB::table('schedule_requests')
+                ->update(['status' => null, 'bukti' => null, 'petugas_id' => null]);
+
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => "Berhasil mengatur ulang periode!"
+                ],
+            );
         } else {
             return response()->json(['message' => 'Tidak memiliki akses'], 401);
         }

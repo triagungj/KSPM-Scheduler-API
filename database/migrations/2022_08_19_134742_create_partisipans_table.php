@@ -24,7 +24,7 @@ class CreatePartisipansTable extends Migration
             $table->foreign('jabatan_id')
                 ->references('id')->on('jabatans')->onDelete('cascade')->constrained('jabatans');
             $table->foreign('username')
-                ->references('username')->on('users')->onDelete('cascade')->constrained('users');
+                ->references('username')->on('users')->onDelete('cascade')->onUpdate('cascade')->constrained('users');
             $table->timestamps();
         });
     }

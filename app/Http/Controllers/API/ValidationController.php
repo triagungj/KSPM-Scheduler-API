@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Enum\PartisipanEnum;
 use App\Models\Enum\StatusEnum;
 use App\Models\Enum\ValidationEnum;
@@ -16,7 +17,9 @@ class ValidationController extends Controller
     public function getListCount()
     {
         $user = auth()->user();
-        if ($user->is_petugas) {
+        $admin =
+            Admin::where('username', $user->username)->first();
+        if ($user->is_petugas || $admin) {
 
             $partisipanRequest = ScheduleRequest::join('partisipans', 'partisipans.id', '=', 'partisipan_id')
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateJabatansTable extends Migration
+class CreateNewsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateJabatansTable extends Migration
      */
     public function up()
     {
-        Schema::create('jabatans', function (Blueprint $table) {
+        Schema::create('news', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('jabatan_category_id');
-            $table->string('name')->unique();
-            $table->foreign('jabatan_category_id')
-                ->references('id')->on('jabatan_categories')->onDelete('cascade')->constrained('jabatan_categories');
+            $table->string('title');
+            $table->text('description');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateJabatansTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('jabatans');
+        Schema::dropIfExists('news');
     }
 }

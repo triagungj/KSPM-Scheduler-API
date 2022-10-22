@@ -3,15 +3,14 @@
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\ScheduleRequestController;
-use App\Http\Controllers\API\SesiController;
 use App\Http\Controllers\API\FileController;
+use App\Http\Controllers\API\NewsController;
 use App\Http\Controllers\API\ScheduleController;
 use App\Http\Controllers\API\ValidationController;
-use App\Models\ScheduleRequest;
 use Illuminate\Support\Facades\Route;
 
 // * AUTH
-Route::post('auth/register', [AuthController::class, 'register']);
+// Route::post('auth/register', [AuthController::class, 'register']);
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('auth/change-password', [AuthController::class, 'changePassword']);
@@ -27,8 +26,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('profile', [ProfileController::class, 'index']);
     Route::post('profile/edit', [ProfileController::class, 'edit']);
 });
-
-// * SESSION
 
 // * SCHEDULE REQUEST
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -55,4 +52,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('schedule/session/{id}', [ScheduleController::class, 'getListDetailSchedule']);
     Route::post('schedule/detail', [ScheduleController::class, 'getDetailSchedule']);
     Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
+});
+
+// * NEWS
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::get('news', [NewsController::class, 'index']);
+    Route::get('news/{id}', [NewsController::class, 'detail']);
 });

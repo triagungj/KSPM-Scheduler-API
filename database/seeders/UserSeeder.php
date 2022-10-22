@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
         ScheduleRequest::create([
             'id' => $requestId,
             'partisipan_id' => $partisipanId,
-            'status' => StatusEnum::Requested,
+            'status' => StatusEnum::Accepted,
             // 'status' => ($randomRequest)
             //     ? StatusEnum::Requested
             //     : null,
@@ -95,30 +95,30 @@ class UserSeeder extends Seeder
             'is_superuser' => false,
         ]);
 
-        $userUuid = Str::uuid();
-        User::create([
-            'id' => Str::uuid(),
-            'username' => 'faradhika',
-            'password' => Hash::make('12345678'),
-            'is_petugas' => false,
-        ]);
+        // $userUuid = Str::uuid();
+        // User::create([
+        //     'id' => Str::uuid(),
+        //     'username' => 'faradhika',
+        //     'password' => Hash::make('12345678'),
+        //     'is_petugas' => false,
+        // ]);
 
-        $jabatan = DB::table('jabatans')
-            ->inRandomOrder()
-            ->first();
-        Partisipan::create([
-            'id' => $userUuid,
-            'username' => 'faradhika',
-            'name' => 'Faradhika M. D.',
-            'member_id' => 'P1234215124213',
-            'phone_number' => '6282327495261',
-            'jabatan_id' => $jabatan->id,
-        ]);
+        // $jabatan = DB::table('jabatans')
+        //     ->inRandomOrder()
+        //     ->first();
+        // Partisipan::create([
+        //     'id' => $userUuid,
+        //     'username' => 'faradhika',
+        //     'name' => 'Faradhika M. D.',
+        //     'member_id' => 'P1234215124213',
+        //     'phone_number' => '6282327495261',
+        //     'jabatan_id' => $jabatan->id,
+        // ]);
 
-        ScheduleRequest::create([
-            'id' => Str::uuid(),
-            'partisipan_id' => $userUuid,
-        ]);
+        // ScheduleRequest::create([
+        //     'id' => Str::uuid(),
+        //     'partisipan_id' => $userUuid,
+        // ]);
 
         $faker = Faker::create('id_ID');
 
@@ -222,9 +222,10 @@ class UserSeeder extends Seeder
             ScheduleRequest::create([
                 'id' => $requestId,
                 'partisipan_id' => $partisipanId,
-                'status' => ($randomRequest)
-                    ? StatusEnum::Requested
-                    : null,
+                'status' => StatusEnum::Accepted
+                // 'status' => ($randomRequest)
+                //     ? StatusEnum::Requested
+                //     : null,
             ]);
 
             foreach ($listId as $sesiId) {
