@@ -10,7 +10,6 @@ use App\Http\Controllers\API\ValidationController;
 use Illuminate\Support\Facades\Route;
 
 // * AUTH
-// Route::post('auth/register', [AuthController::class, 'register']);
 Route::get('auth/contact', [AuthController::class, 'getAdminContact']);
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {

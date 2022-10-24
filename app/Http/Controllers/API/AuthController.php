@@ -93,7 +93,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'status' => 200,
-                    'data' => $phoneNumber,
+                    'message' => $phoneNumber,
                 ],
             );
         } else {
