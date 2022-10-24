@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use App\Models\Partisipan;
 use App\Models\Petugas;
 use App\Models\ScheduleRequest;
@@ -37,14 +38,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'new_password' => 'required|string|min:8',
         ]);
-        
+
         if ($validator->fails()) {
             $error = $validator->errors();
             return response()->json([
                 'message' => $error->first('new_password')
             ], 401,);
         }
-        
+
         $user = auth()->user();
         $data =
             User::where('username', $user->username)->firstOrFail();
@@ -80,5 +81,23 @@ class AuthController extends Controller
             'status' => 200,
             'message' => 'Kamu telah berhasil logout!'
         ];
+    }
+
+    public function getAdminContact()
+    {
+        $data = Admin::first();
+
+        if ($data) {
+            $phoneNumber = $data->phone_number;
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => $phoneNumber,
+                ],
+            );
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
     }
 }
