@@ -146,6 +146,14 @@ class ScheduleController extends Controller
                     ->get();
             }
 
+            $imagePath = url('/image') . '/';
+
+            foreach ($listPartisipans as $partisipan) {
+                if ($partisipan->avatar_url != null) {
+                    $partisipan->avatar_url = $imagePath . $partisipan->avatar_url;
+                }
+            }
+
             $sesiCursor = Sesi::find($sesiId);
 
             $data = [
@@ -188,7 +196,7 @@ class ScheduleController extends Controller
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
                 ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
                 ->where('jabatan_categories.name', '=', 'Anggota')
-                ->get();                                                                                                                                
+                ->get();
 
             $individu = [];
 
