@@ -182,10 +182,8 @@ class ScheduleController extends Controller
         if ($admin || $user->petugas->is_superuser) {
             $population = 2;
 
-            Schedule::truncate();
-
             $pertemuans = Pertemuan::all();
-            $sesis = Sesi::all();
+            $sesisCount = Sesi::all()->count();
 
             $totalStaff = DB::table('partisipans')
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
@@ -214,9 +212,10 @@ class ScheduleController extends Controller
 
                         $scheduleCandidates = DB::table('schedule_candidates')
                             ->select([
-                                'schedule_requests.*',
+                                'partisipans.name as partisipan_name',
                                 'schedule_candidates.id as schedule_candidate_id',
                                 'jabatan_categories.name as jabatan_category',
+                                'session_id'
                             ])
                             ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
                             ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
@@ -236,12 +235,12 @@ class ScheduleController extends Controller
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
                                 } else if ($scheduleCandidate->jabatan_category == 'Staff') {
-                                    if ($staff < count($totalStaff) / (count($sesis) / 2)) {
+                                    if ($staff < count($totalStaff) / ($sesisCount / 2)) {
                                         $staff++;
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
                                 } else {
-                                    if ($anggota < count($totalAnggota) / (count($sesis) / 2)) {
+                                    if ($anggota < count($totalAnggota) / ($sesisCount / 2)) {
                                         $anggota++;
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
@@ -249,8 +248,8 @@ class ScheduleController extends Controller
                             }
                         }
                         $isPengurusIntiFit = $pengurusInti >= 1 && $pengurusInti <= 2;
-                        $isStaffFit = $staff <= count($totalStaff) / (count($sesis) / 2);
-                        $isAnggotaFit = $anggota <= count($totalAnggota) / (count($sesis) / 2);
+                        $isStaffFit = $staff <= count($totalStaff) / ($sesisCount / 2);
+                        $isAnggotaFit = $anggota <= count($totalAnggota) / ($sesisCount / 2);
 
 
                         if ($isPengurusIntiFit && $isStaffFit && $isAnggotaFit) {
@@ -259,7 +258,7 @@ class ScheduleController extends Controller
                     }
                 }
 
-                $fitness = $fitnessTotal != null ? (float) $fitnessTotal / count($sesis) : null;
+                $fitness = $fitnessTotal != null ? (float) $fitnessTotal / $sesisCount : null;
 
                 array_push($individu, [
                     'fitness' => $fitness,
@@ -278,20 +277,55 @@ class ScheduleController extends Controller
                 }
             }
 
-            foreach ($temp['schedule'] as $schedule) {
-                Schedule::create([
-                    'id' => Str::uuid(),
-                    'schedule_candidate_id' => $schedule->schedule_candidate_id,
-                ]);
+            // foreach ($temp['schedule'] as $schedule) {
+            //     Schedule::create([
+            //         'id' => Str::uuid(),
+            //         'schedule_candidate_id' => $schedule->schedule_candidate_id,
+            //     ]);
+            // }
+
+            $collection = DB::table('sesis')
+                ->selectRaw('count(id) as total, hari')
+                ->groupBy('hari')
+                ->get();
+            $result = [];
+            foreach ($collection as $data) {
+                $listSesi = Sesi::where('hari', $data->hari)->get();
+                $listDetailSesi = [];
+                foreach ($listSesi as $sesi) {
+                    $pengurus = [];
+                    $anggota = [];
+                    foreach ($temp['schedule'] as $schedule) {
+                        if ($schedule->session_id == $sesi->id) {
+                            if ($schedule->jabatan_category == 'Anggota') {
+                                array_push($anggota, $schedule);
+                            } else {
+                                array_push($pengurus, $schedule);
+                            }
+                        }
+                    }
+                    $detailSesi = [
+                        'name' => $sesi->name,
+                        'waktu' => $sesi->waktu,
+                        'pengurus' => $pengurus,
+                        'anggota' => $anggota
+                    ];
+                    array_push($listDetailSesi, $detailSesi);
+                }
+                $detailResult = [
+                    'hari' => $data->hari,
+                    'list_sesi' => $listDetailSesi,
+                ];
+                array_push($result, $detailResult);
             }
 
             return
                 response()->json(
                     [
                         'status' => 200,
-                        'message' => 'Berhasil Mengatur Ulang Jadwal',
+                        'message' => 'Generate jadwal berhasil',
                         'total' => count($individu),
-                        // 'data' => $temp,
+                        'data' => $result,
                     ],
                 );
         } else {
@@ -318,11 +352,9 @@ class ScheduleController extends Controller
                 $listSesi = Sesi::where('hari', $data->hari)->get();
                 $listDetailSesi = [];
                 foreach ($listSesi as $sesi) {
-                    $pengurus = [];
-                    $anggota = [];
-                    $listPengurus =
+                    $pengurus =
                         DB::table('schedules')
-                        ->select(['partisipans.name'])
+                        ->select(['schedule_candidates.id as schedule_candadate_id', 'partisipans.name as partisipan_name'])
                         ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
                         ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
                         ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
@@ -331,9 +363,9 @@ class ScheduleController extends Controller
                         ->where('sesis.id', '=', $sesi->id)
                         ->where('jabatans.name', '!=', 'Anggota Magang')
                         ->get();
-                    $listAnggota =
+                    $anggota =
                         DB::table('schedules')
-                        ->select(['partisipans.name'])
+                        ->select(['schedule_candidates.id as schedule_candadate_id', 'partisipans.name as partisipan_name'])
                         ->join('schedule_candidates', 'schedule_candidates.id', '=', 'schedules.schedule_candidate_id')
                         ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
                         ->join('sesis', 'sesis.id', '=', 'schedule_candidates.session_id')
@@ -342,13 +374,6 @@ class ScheduleController extends Controller
                         ->where('sesis.id', '=', $sesi->id)
                         ->where('jabatans.name', '=', 'Anggota Magang')
                         ->get();
-
-                    foreach ($listPengurus as $dataPartisipan) {
-                        array_push($pengurus, $dataPartisipan->name);
-                    }
-                    foreach ($listAnggota as $dataAnggota) {
-                        array_push($anggota, $dataAnggota->name);
-                    }
                     $detailSesi = [
                         'name' => $sesi->name,
                         'waktu' => $sesi->waktu,
@@ -369,6 +394,37 @@ class ScheduleController extends Controller
                     'status' => 200,
                     'last_update' => $lastUpdate != null ? $lastUpdate->updated_at . 'Z' : null,
                     'data' => $lastUpdate != null ?  $result : [],
+                ],
+            );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function submitSchedule(Request $request)
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin) {
+            Schedule::truncate();
+            $listSession = $request->input('schedule_candidates');
+            $listSessionId = [];
+            foreach ($listSession as $sessionRequest) {
+                $session = [
+                    'id' => Str::uuid(),
+                    'schedule_candidate_id' => $sessionRequest,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+                array_push($listSessionId, $session);
+            }
+            Schedule::insert($listSessionId);
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => 'Jadwal Berhasil Diterbitkan'
                 ],
             );
         } else {
