@@ -194,17 +194,8 @@ class ScheduleController extends Controller
             }
 
             $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
-            $totalStaff = DB::table('partisipans')
-                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
-                ->where('jabatan_categories.name', '=', 'Staff')
-                ->count();
-            $totalAnggota = DB::table('partisipans')
-                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
-                ->where('jabatan_categories.name', '=', 'Anggota')
-                ->count();
-            if ($totalAccepted < $totalStaff + $totalAnggota) {
+            $totalPartisipan = DB::table('partisipans')->count();
+            if ($totalAccepted < $totalPartisipan) {
                 return response()->json(
                     [
                         'status' => 403,
@@ -218,6 +209,17 @@ class ScheduleController extends Controller
             $pertemuans = Pertemuan::all();
             $sesisCount = Sesi::all()->count();
             $individu = [];
+
+            $totalStaff = DB::table('partisipans')
+                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+                ->where('jabatan_categories.name', '=', 'Staff')
+                ->count();
+            $totalAnggota = DB::table('partisipans')
+                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+                ->where('jabatan_categories.name', '=', 'Anggota')
+                ->count();
 
             for ($i = 0; $i < $population; $i++) {
                 $sessionSchedule = [];
