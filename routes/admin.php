@@ -31,6 +31,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::put('account/partisipan/{id}', [AccountController::class, 'updatePartisipan']);
     Route::delete('account/partisipan/{id}', [AccountController::class, 'deletePartisipan']);
     Route::delete('account/partisipans', [AccountController::class, 'deleteAllPartisipan']);
+    Route::post('account/partisipans', [AccountController::class, 'generatePartisipan']);
 
     Route::get('account/petugas', [
         AccountController::class,

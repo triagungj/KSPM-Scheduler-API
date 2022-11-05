@@ -17,7 +17,7 @@ class Jabatan extends Model
 
     public function jabatan_categories()
     {
-        $this->belongsTo(JabatanCategory::class, 'id', 'jabatan_category_id');
+        return $this->belongsTo(JabatanCategory::class, 'id', 'jabatan_category_id');
     }
     protected $casts = [
         'id' => 'string'

@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             PertemuanSeeder::class,
             JabatanSeeder::class,
             UserSeeder::class,
-            NewsSeeder::class,
+            // NewsSeeder::class,
             // ScheduleRequestSeeder::class,
         ]);
     }

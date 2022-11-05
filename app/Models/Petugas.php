@@ -14,11 +14,9 @@ class Petugas extends Model
         'username',
         'name',
         'phone_number',
-        'is_superuser'
     ];
 
     protected $casts = [
-        'is_superuser' => 'boolean',
         'id' => 'string'
     ];
 

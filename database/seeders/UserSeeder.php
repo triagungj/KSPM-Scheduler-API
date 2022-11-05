@@ -77,7 +77,6 @@ class UserSeeder extends Seeder
             'username' => 'triagungj',
             'name' => 'Tri Agung J',
             'phone_number' => '6282327495261',
-            'is_superuser' => true,
         ]);
 
         User::create([
@@ -92,7 +91,6 @@ class UserSeeder extends Seeder
             'username' => 'validator',
             'name' => 'User Validator',
             'phone_number' => '6282327495261',
-            'is_superuser' => false,
         ]);
 
         // $userUuid = Str::uuid();
