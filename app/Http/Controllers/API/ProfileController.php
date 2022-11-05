@@ -74,6 +74,7 @@ class ProfileController extends Controller
                 'name' => 'required|string|max:255',
                 'member_id' => 'required|string|max:255',
                 'phone_number' => 'required|string|min:8',
+                'jabatan_id' => 'required|string|min:8',
                 'image' => 'mimes:png,jpg,jpeg|max:2048',
             ]);
             if ($validator->fails()) {
@@ -83,6 +84,7 @@ class ProfileController extends Controller
                 Partisipan::where('username', $user->username)->firstOrFail();
             $data->name = $request->name;
             $data->member_id = $request->member_id;
+            $data->jabatan_id = $request->jabatan_id;
             $data->phone_number = $request->phone_number;
             if ($image = $request->file('image')) {
                 $image->store('/public/images');

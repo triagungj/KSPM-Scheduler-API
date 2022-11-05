@@ -151,15 +151,18 @@ class ScheduleRequestController extends Controller
             }
             ScheduleCandidate::where('schedule_request_id', $dataRequestSchedule->id)->delete();
 
-            $listSession = $request->input('list_session_id');
+            $listSessionRequest = $request->input('list_session_id');
 
-            foreach ($listSession as $session) {
-                ScheduleCandidate::create([
+            $listSession = [];
+            foreach ($listSessionRequest as $sessionRequest) {
+                $session = [
                     'id' => Str::uuid(),
                     'schedule_request_id' => $dataRequestSchedule->id,
-                    'session_id' => $session,
-                ]);
+                    'session_id' => $sessionRequest,
+                ];
+                array_push($listSession, $session);
             }
+            DB::table('schedule_candidates')->insert($listSession);
 
             $dataRequestSchedule->catatan_partisipan = $request->partisipan_notes;
             if ($file = $request->file('file')) {
