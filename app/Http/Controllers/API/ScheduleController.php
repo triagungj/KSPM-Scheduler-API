@@ -179,23 +179,44 @@ class ScheduleController extends Controller
         $admin =
             Admin::where('username', $user->username)->first();
 
-        if ($admin || $user->petugas->is_superuser) {
-            $population = 2;
+        if ($admin) {
+            $partisipanNull = DB::table('partisipans')
+                ->where('jabatan_id', '=', null)
+                ->count();
+            if ($partisipanNull > 0) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat Partisipan yang belum mengisi data Jabatan.',
+                    ],
+                    403
+                );
+            }
 
-            $pertemuans = Pertemuan::all();
-            $sesisCount = Sesi::all()->count();
-
+            $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
             $totalStaff = DB::table('partisipans')
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
                 ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
                 ->where('jabatan_categories.name', '=', 'Staff')
-                ->get();
+                ->count();
             $totalAnggota = DB::table('partisipans')
                 ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
                 ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
                 ->where('jabatan_categories.name', '=', 'Anggota')
-                ->get();
+                ->count();
+            if ($totalAccepted < $totalStaff + $totalAnggota) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat ajuan Jadwal yang belum diterima petugas.',
+                    ],
+                    403
+                );
+            }
 
+            $population = 2;
+            $pertemuans = Pertemuan::all();
+            $sesisCount = Sesi::all()->count();
             $individu = [];
 
             for ($i = 0; $i < $population; $i++) {
@@ -235,12 +256,12 @@ class ScheduleController extends Controller
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
                                 } else if ($scheduleCandidate->jabatan_category == 'Staff') {
-                                    if ($staff < count($totalStaff) / ($sesisCount / 2)) {
+                                    if ($staff < $totalStaff / ($sesisCount / 2)) {
                                         $staff++;
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
                                 } else {
-                                    if ($anggota < count($totalAnggota) / ($sesisCount / 2)) {
+                                    if ($anggota < $totalAnggota / ($sesisCount / 2)) {
                                         $anggota++;
                                         array_push($sessionSchedule, $scheduleCandidate);
                                     }
@@ -248,8 +269,8 @@ class ScheduleController extends Controller
                             }
                         }
                         $isPengurusIntiFit = $pengurusInti >= 1 && $pengurusInti <= 2;
-                        $isStaffFit = $staff <= count($totalStaff) / ($sesisCount / 2);
-                        $isAnggotaFit = $anggota <= count($totalAnggota) / ($sesisCount / 2);
+                        $isStaffFit = $staff <= $totalStaff / ($sesisCount / 2);
+                        $isAnggotaFit = $anggota <= $totalAnggota / ($sesisCount / 2);
 
 
                         if ($isPengurusIntiFit && $isStaffFit && $isAnggotaFit) {
@@ -266,9 +287,6 @@ class ScheduleController extends Controller
                     'schedule' => $sessionSchedule,
                 ]);
             }
-
-            // $allSchedule = Schedule::join('schedule_candidates', 'schedule_candidates.id', '=', 'schedule_candidate_id')
-            //     ->get(['schedule_candidates.*']);
             $temp = $individu[0];
 
             foreach ($individu as $cromosom) {
@@ -276,13 +294,6 @@ class ScheduleController extends Controller
                     $temp = $cromosom;
                 }
             }
-
-            // foreach ($temp['schedule'] as $schedule) {
-            //     Schedule::create([
-            //         'id' => Str::uuid(),
-            //         'schedule_candidate_id' => $schedule->schedule_candidate_id,
-            //     ]);
-            // }
 
             $collection = DB::table('sesis')
                 ->selectRaw('count(id) as total, hari')
@@ -339,7 +350,7 @@ class ScheduleController extends Controller
         $admin =
             Admin::where('username', $user->username)->first();
 
-        if ($admin || $user->petugas->is_superuser) {
+        if ($admin) {
             $result = [];
             $detailResult = [];
 
@@ -408,6 +419,39 @@ class ScheduleController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
+            $partisipanNull = DB::table('partisipans')
+                ->where('jabatan_id', '=', null)
+                ->count();
+            if ($partisipanNull > 0) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat Partisipan yang belum mengisi data Jabatan.',
+                    ],
+                    403
+                );
+            }
+
+            $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
+            $totalStaff = DB::table('partisipans')
+                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+                ->where('jabatan_categories.name', '=', 'Staff')
+                ->count();
+            $totalAnggota = DB::table('partisipans')
+                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+                ->where('jabatan_categories.name', '=', 'Anggota')
+                ->count();
+            if ($totalAccepted < $totalStaff + $totalAnggota) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat ajuan Jadwal yang belum diterima petugas.',
+                    ],
+                    403
+                );
+            }
             Schedule::truncate();
             $listSession = $request->input('schedule_candidates');
             $listSessionId = [];

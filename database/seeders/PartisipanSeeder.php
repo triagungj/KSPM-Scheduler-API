@@ -3,21 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Enum\StatusEnum;
-
 use App\Models\Partisipan;
-use App\Models\Petugas;
 use App\Models\ScheduleCandidate;
 use App\Models\ScheduleRequest;
 use App\Models\Sesi;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
-class UserSeeder extends Seeder
+class PartisipanSeeder extends Seeder
 {
+
     function createUser($jabatanId, $listId)
     {
         $faker = Faker::create('id_ID');
@@ -65,59 +64,6 @@ class UserSeeder extends Seeder
 
     public function run()
     {
-        User::create([
-            'id' => Str::uuid(),
-            'username' => 'triagungj',
-            'password' => Hash::make('12345678'),
-            'is_petugas' => true,
-        ]);
-
-        Petugas::create([
-            'id' => Str::uuid(),
-            'username' => 'triagungj',
-            'name' => 'Tri Agung J',
-            'phone_number' => '6282327495261',
-        ]);
-
-        User::create([
-            'id' => Str::uuid(),
-            'username' => 'validator',
-            'password' => Hash::make('12345678'),
-            'is_petugas' => true,
-        ]);
-
-        Petugas::create([
-            'id' => Str::uuid(),
-            'username' => 'validator',
-            'name' => 'User Validator',
-            'phone_number' => '6282327495261',
-        ]);
-
-        // $userUuid = Str::uuid();
-        // User::create([
-        //     'id' => Str::uuid(),
-        //     'username' => 'faradhika',
-        //     'password' => Hash::make('12345678'),
-        //     'is_petugas' => false,
-        // ]);
-
-        // $jabatan = DB::table('jabatans')
-        //     ->inRandomOrder()
-        //     ->first();
-        // Partisipan::create([
-        //     'id' => $userUuid,
-        //     'username' => 'faradhika',
-        //     'name' => 'Faradhika M. D.',
-        //     'member_id' => 'P1234215124213',
-        //     'phone_number' => '6282327495261',
-        //     'jabatan_id' => $jabatan->id,
-        // ]);
-
-        // ScheduleRequest::create([
-        //     'id' => Str::uuid(),
-        //     'partisipan_id' => $userUuid,
-        // ]);
-
         $faker = Faker::create('id_ID');
 
         $listId = [];

@@ -18,9 +18,9 @@ class DatabaseSeeder extends Seeder
             AdminSeeder::class,
             PertemuanSeeder::class,
             JabatanSeeder::class,
-            UserSeeder::class,
+            PartisipanSeeder::class,
+            PetugasSeeder::class,
             // NewsSeeder::class,
-            // ScheduleRequestSeeder::class,
         ]);
     }
 }

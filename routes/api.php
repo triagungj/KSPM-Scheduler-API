@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\JabatanController;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProfileController;
 use App\Http\Controllers\API\ScheduleRequestController;
@@ -25,6 +26,7 @@ Route::get('file/{fileName}', [FileController::class, 'file']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('profile', [ProfileController::class, 'index']);
     Route::post('profile/edit', [ProfileController::class, 'edit']);
+    Route::get('jabatans', [JabatanController::class, 'index']);
 });
 
 // * SCHEDULE REQUEST
