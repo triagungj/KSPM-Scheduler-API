@@ -182,7 +182,7 @@ class AccountController extends Controller
             Admin::where('username', $auth->username)->first();
         if ($admin) {
             $validator = Validator::make($request->all(), [
-                'file' => 'required|mimes:csv|max:2048',
+                'file' => 'required|mimes:csv,txt|max:2048',
             ]);
 
             if ($validator->fails()) {
