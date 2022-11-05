@@ -193,7 +193,7 @@ class ScheduleController extends Controller
                 );
             }
 
-            $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
+            $totalAccepted = DB::table('schedule_requests')->where('status', '=', 'accepted')->count();
             $totalPartisipan = DB::table('partisipans')->count();
             if ($totalAccepted < $totalPartisipan) {
                 return response()->json(
@@ -454,7 +454,7 @@ class ScheduleController extends Controller
                     403
                 );
             }
-            Schedule::truncate();
+            DB::table('schedules')->delete();
             $listSession = $request->input('schedule_candidates');
             $listSessionId = [];
             foreach ($listSession as $sessionRequest) {
@@ -485,7 +485,8 @@ class ScheduleController extends Controller
             Admin::where('username', $user->username)->first();
 
         if ($admin) {
-            ScheduleCandidate::where('id', 'like', '%%')->delete();
+            DB::table('schedules')->delete();
+            DB::table('schedule_candidates')->delete();
             DB::table('schedule_requests')
                 ->update(['status' => null, 'bukti' => null, 'petugas_id' => null]);
 
