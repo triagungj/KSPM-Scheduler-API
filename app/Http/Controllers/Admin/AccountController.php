@@ -208,7 +208,7 @@ class AccountController extends Controller
                             'id' => $partisipanId,
                             'username' => $data[0],
                             'name' => $data[1],
-                            'member_id' => 'p23273e2',
+                            'member_id' => $data[4],
                             'phone_number' => $data[3]
                         ];
 
