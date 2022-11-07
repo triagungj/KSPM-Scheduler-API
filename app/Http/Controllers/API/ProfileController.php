@@ -28,7 +28,7 @@ class ProfileController extends Controller
         } else {
             $data =
                 Partisipan::where('username', $user->username)->firstOrFail();
-            $jabatan = $data->jabatan;
+            $jabatan = $data->jabatans;
             $avatarUrl = $data->avatar_url != null
                 ? url('/image') . '/' . $data->avatar_url
                 : null;
@@ -39,7 +39,8 @@ class ProfileController extends Controller
                         'data' => [
                             'name' => $data->name,
                             'phone_number' => $data->phone_number,
-                            'jabatan' => $jabatan->name,
+                            'jabatan_id' => $data->jabatan_id,
+                            'jabatan' => $jabatan->name ?? null,
                             'member_id' => $data->member_id,
                             'avatar_url' => $avatarUrl,
                         ]
