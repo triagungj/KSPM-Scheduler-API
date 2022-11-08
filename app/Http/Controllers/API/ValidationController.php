@@ -183,7 +183,7 @@ class ValidationController extends Controller
 
             $partisipan = [
                 'name' => $partisipan->name,
-                'jabatan' => $partisipan->jabatan->name,
+                'jabatan' => $partisipan->jabatans->name,
                 'member_id' => $partisipan->member_id,
                 'phone' => $partisipan->phone_number,
                 'avatar_url' => $avatarUrl,

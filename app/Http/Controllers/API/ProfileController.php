@@ -28,7 +28,7 @@ class ProfileController extends Controller
         } else {
             $data =
                 Partisipan::where('username', $user->username)->firstOrFail();
-            $jabatan = $data->jabatan;
+            $jabatan = $data->jabatans;
             $avatarUrl = $data->avatar_url != null
                 ? url('/image') . '/' . $data->avatar_url
                 : null;
@@ -39,7 +39,8 @@ class ProfileController extends Controller
                         'data' => [
                             'name' => $data->name,
                             'phone_number' => $data->phone_number,
-                            'jabatan' => $jabatan->name,
+                            'jabatan_id' => $data->jabatan_id,
+                            'jabatan' => $jabatan->name ?? null,
                             'member_id' => $data->member_id,
                             'avatar_url' => $avatarUrl,
                         ]
@@ -74,6 +75,7 @@ class ProfileController extends Controller
                 'name' => 'required|string|max:255',
                 'member_id' => 'required|string|max:255',
                 'phone_number' => 'required|string|min:8',
+                'jabatan_id' => 'required|string|min:8',
                 'image' => 'mimes:png,jpg,jpeg|max:2048',
             ]);
             if ($validator->fails()) {
@@ -83,6 +85,7 @@ class ProfileController extends Controller
                 Partisipan::where('username', $user->username)->firstOrFail();
             $data->name = $request->name;
             $data->member_id = $request->member_id;
+            $data->jabatan_id = $request->jabatan_id;
             $data->phone_number = $request->phone_number;
             if ($image = $request->file('image')) {
                 $image->store('/public/images');

@@ -22,14 +22,14 @@ class AuthController extends Controller
             $user = User::where('username', $user->username)->firstOrFail();
             $token = $user->createToken('auth_token')->plainTextToken;
             if ($user->is_petugas == true) {
-                $data = Petugas::where('username', $request['username'])->firstOrFail();
-                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'is_superuser' => $data->is_superuser, 'message' => 'Login Berhasil!', 'token' => $token]);
+                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
             } else {
                 $data = Partisipan::where('username', $request['username'])->firstOrFail();
-                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token]);
+                $updated = $data->jabatan_id != null;
+                return response()->json(['status' => 200, 'is_petugas' => $user->is_petugas, 'message' => 'Login Berhasil!', 'token' => $token, 'updated' => $updated,]);
             }
         } else {
-            return response()->json(['status' => 401, 'message' => 'Username/Password salah']);
+            return response()->json(['status' => 401, 'message' => 'Username/Password salah'], 401);
         }
     }
 

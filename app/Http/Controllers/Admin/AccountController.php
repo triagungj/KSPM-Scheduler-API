@@ -9,6 +9,7 @@ use App\Models\Petugas;
 use App\Models\ScheduleRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -23,7 +24,7 @@ class AccountController extends Controller
         if ($data) {
             $query = $request->query('query');
             $partisipans = Partisipan::select(['partisipans.*', 'jabatans.name as jabatan'])
-                ->join('jabatans', 'jabatans.id', '=', 'jabatan_id')
+                ->leftJoin('jabatans', 'jabatans.id', '=', 'jabatan_id')
                 ->where('partisipans.name', 'like', '%' . $query . '%')
                 ->orderBy('created_at', 'desc')->paginate(10);
 
@@ -67,7 +68,6 @@ class AccountController extends Controller
                 'name' => 'required|string',
                 'phone_number' => 'required|string|min:8',
                 'member_id' => 'required|string|min:8',
-                'jabatan_id' => 'required|string',
             ]);
 
             if ($validator->fails()) {
@@ -175,6 +175,87 @@ class AccountController extends Controller
             return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
         }
     }
+    public function generatePartisipan(Request $request)
+    {
+        $auth = auth()->user();
+        $admin =
+            Admin::where('username', $auth->username)->first();
+        if ($admin) {
+            $validator = Validator::make($request->all(), [
+                'file' => 'required|mimes:csv,txt|max:2048',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['message' => $validator->errors()->first()], 400);
+            }
+
+            if ($file = $request->file('file')) {
+                $file->store('/public/files');
+                $fileName = $request->file('file')->hashName();
+                $filePath = storage_path('app/public/files/' . $fileName);
+                $row = 1;
+                $partisipans = [];
+                $listScheduleRequest = [];
+                $users = [];
+                if (($handle = fopen($filePath, "r")) !== FALSE) {
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        if ($row == 1) {
+                            $row++;
+                            continue;
+                        }
+                        $partisipanId = Str::uuid();
+                        $partisipan = [
+                            'id' => $partisipanId,
+                            'username' => $data[0],
+                            'name' => $data[1],
+                            'member_id' => $data[4],
+                            'phone_number' => $data[3]
+                        ];
+
+                        $scheduleRequest = [
+                            'id' => Str::uuid(),
+                            'partisipan_id' => $partisipanId,
+                            'status' => null,
+                        ];
+                        $user = [
+                            'id' => Str::uuid(),
+                            'username' => $data[0],
+                            'password' => Hash::make($data[2]),
+                        ];
+
+                        array_push($users, $user);
+                        array_push($partisipans, $partisipan);
+                        array_push($listScheduleRequest, $scheduleRequest);
+                        $row++;
+                    }
+                    fclose($handle);
+                }
+            }
+
+            $insertUsers = DB::table('users')->insert($users);
+            $insertPartisipan = DB::table('partisipans')->insert($partisipans);
+            $insertScheduleRequest = DB::table('schedule_requests')->insert($listScheduleRequest);
+
+            if ($insertPartisipan && $insertUsers && $insertScheduleRequest) {
+                return response()->json(
+                    [
+                        'status' => 200,
+                        'message' => "Berhasil menambah Partisipan",
+                    ],
+                );
+            } else {
+                return response()->json(
+                    [
+                        'status' => 400,
+                        'message' => "Gagal menambah Partisipan",
+                    ],
+                );
+            }
+        } else {
+            return response()->json(['status' => 401, 'message' => 'Unauthorized'], 401);
+        }
+    }
+
     public function deleteAllPartisipan()
     {
         $user = auth()->user();
@@ -243,7 +324,6 @@ class AccountController extends Controller
                     ? 'required|string|min:8'
                     : '',
                 'phone_number' => 'required|string|min:8',
-                'super_user' => 'required|boolean',
             ]);
 
             if ($validator->fails()) {
@@ -264,7 +344,6 @@ class AccountController extends Controller
 
             $petugas->name = $request->name;
             $petugas->phone_number = $request->phone_number;
-            $petugas->is_superuser = $request->super_user;
             if ($petugas->save()) {
                 return response()->json(
                     [
@@ -288,7 +367,6 @@ class AccountController extends Controller
                 'password' => 'required|string|min:8',
                 'name' => 'required|string',
                 'phone_number' => 'required|string|min:8',
-                'super_user' => 'required|boolean'
             ]);
 
             if ($validator->fails()) {
@@ -307,7 +385,6 @@ class AccountController extends Controller
                 'username' => $request->username,
                 'name' => $request->name,
                 'phone_number' => $request->phone_number,
-                'is_superuser' => $request->super_user,
             ]);
 
             return response()->json(

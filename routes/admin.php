@@ -31,6 +31,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::put('account/partisipan/{id}', [AccountController::class, 'updatePartisipan']);
     Route::delete('account/partisipan/{id}', [AccountController::class, 'deletePartisipan']);
     Route::delete('account/partisipans', [AccountController::class, 'deleteAllPartisipan']);
+    Route::post('account/partisipans', [AccountController::class, 'generatePartisipan']);
 
     Route::get('account/petugas', [
         AccountController::class,
@@ -51,6 +52,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::get('schedule', [ScheduleController::class, 'getAllSchedule']);
     Route::get('schedule/count', [ValidationController::class, 'getListCount']);
     Route::get('schedule/generate', [ScheduleController::class, 'generateSchedule']);
+    Route::post('schedule/submit', [ScheduleController::class, 'submitSchedule']);
     Route::get('schedule/reset', [ScheduleController::class, 'resetSchedule']);
 
     Route::get('master/pertemuan', [PertemuanController::class, 'index']);
