@@ -16,15 +16,14 @@ use Illuminate\Support\Facades\Hash;
 
 class PartisipanSeeder extends Seeder
 {
-    function createUser($jabatanId, $listId, $randomRate, $username)
+
+    function createUser($jabatanId, $listId, $randomRate)
     {
         $faker = Faker::create('id_ID');
 
         $partisipanId = Str::uuid();
         $requestId =  Str::uuid();
-        // $username = $faker->username;
-        $username = $username;
-
+        $username = $faker->username;
         User::create([
             'id' => Str::uuid(),
             'username' => $username,
@@ -35,8 +34,7 @@ class PartisipanSeeder extends Seeder
         Partisipan::create([
             'id' => $partisipanId,
             'username' => $username,
-            'name' => $username,
-            // 'name' => $faker->name(),
+            'name' => $faker->name(),
             'member_id' => $faker->numerify('P###########'),
             'phone_number' => $faker->phoneNumber,
             'jabatan_id' => $jabatanId,
@@ -52,7 +50,6 @@ class PartisipanSeeder extends Seeder
         ]);
 
         foreach ($listId as $sesiId) {
-
             $randomRequest = rand(0, 100) / 100 <= $randomRate;
             if ($randomRequest) {
                 ScheduleCandidate::create([
@@ -66,7 +63,7 @@ class PartisipanSeeder extends Seeder
 
     public function run()
     {
-        $randomRate = 0.5;
+        $randomRate = 0.2;
 
         $listId = [];
         $listSesi = Sesi::all();
@@ -76,72 +73,72 @@ class PartisipanSeeder extends Seeder
 
         $ketum = DB::table('jabatans')
             ->where('name', '=', 'Ketua Umum')->first();
-        $this->createUser($ketum->id, $listId, $randomRate, 'ketua_umum');
+        $this->createUser($ketum->id, $listId, $randomRate);
 
         $ketuaEdukasi = DB::table('jabatans')
             ->where('name', '=', 'Ketua Edukasi')->first();
-        $this->createUser($ketuaEdukasi->id, $listId, $randomRate, 'ketua_edukasi');
+        $this->createUser($ketuaEdukasi->id, $listId, $randomRate);
 
         $ketuaTrading = DB::table('jabatans')
             ->where('name', '=', 'Ketua Trading')->first();
-        $this->createUser($ketuaTrading->id, $listId, $randomRate, 'ketua_trading');
+        $this->createUser($ketuaTrading->id, $listId, $randomRate);
 
         $ketuaHrd = DB::table('jabatans')
             ->where('name', '=', 'Ketua HRD')->first();
-        $this->createUser($ketuaHrd->id, $listId, $randomRate, 'ketua_hrd');
+        $this->createUser($ketuaHrd->id, $listId, $randomRate);
 
         $ketumRnD = DB::table('jabatans')
             ->where('name', '=', 'Ketua RnD')->first();
-        $this->createUser($ketumRnD->id, $listId, $randomRate, 'ketua_rnd');
+        $this->createUser($ketumRnD->id, $listId, $randomRate);
 
         $sekum = DB::table('jabatans')
             ->where('name', '=', 'Sekretaris Umum')->first();
-        for ($i = 1; $i <= 2; $i++) {
-            $this->createUser($sekum->id, $listId, $randomRate, 'sekum' . $i);
+        for ($i = 0; $i <= 2; $i++) {
+            $this->createUser($sekum->id, $listId, $randomRate);
         }
 
         $bendum = DB::table('jabatans')
             ->where('name', '=', 'Bendahara Umum')->first();
-        for ($i = 1; $i <= 2; $i++) {
-            $this->createUser($bendum->id, $listId, $randomRate, 'bendum' . $i);
+        for ($i = 0; $i <= 2; $i++) {
+            $this->createUser($bendum->id, $listId, $randomRate);
         }
 
         $bursa = DB::table('jabatans')
             ->where('name', '=', 'Bursa')->first();
-        $this->createUser($bursa->id, $listId, $randomRate, 'bursa');
+        $this->createUser($bursa->id, $listId, $randomRate);
 
         $staffEdukasi = DB::table('jabatans')
             ->where('name', '=', 'Staff Edukasi')->first();
-        for ($i = 1; $i <= 6; $i++) {
-            $this->createUser($staffEdukasi->id, $listId, $randomRate, 'staff_edukasi' . $i);
+        for ($i = 0; $i <= 5; $i++) {
+            $this->createUser($staffEdukasi->id, $listId, $randomRate);
         }
 
         $staffRnD = DB::table('jabatans')
             ->where('name', '=', 'Staff RnD')->first();
-        for ($i = 1; $i <= 6; $i++) {
-            $this->createUser($staffRnD->id, $listId, $randomRate, 'staff_rnd' . $i);
+        for ($i = 0; $i <= 5; $i++) {
+            $this->createUser($staffRnD->id, $listId, $randomRate);
         }
 
         $staffHRD = DB::table('jabatans')
             ->where('name', '=', 'Staff HRD')->first();
-        for ($i = 1; $i <= 6; $i++) {
-            $this->createUser($staffHRD->id, $listId, $randomRate, 'staff_hrd' . $i);
+        for ($i = 0; $i <= 5; $i++) {
+            $this->createUser($staffHRD->id, $listId, $randomRate);
         }
 
         $staffTrading = DB::table('jabatans')
             ->where('name', '=', 'Staff Trading')->first();
-        for ($i = 1; $i <= 6; $i++) {
-            $this->createUser($staffTrading->id, $listId, $randomRate, 'staff_trading' . $i);
+        for ($i = 0; $i <= 5; $i++) {
+            $this->createUser($staffTrading->id, $listId, $randomRate);
         }
         $staffPRD = DB::table('jabatans')
             ->where('name', '=', 'Staff PRD')->first();
-        for ($i = 1; $i <= 6; $i++) {
-            $this->createUser($staffPRD->id, $listId, $randomRate, 'staff_prd' . $i);
+        for ($i = 1; $i <= 4; $i++) {
+            $this->createUser($staffPRD->id, $listId, $randomRate);
         }
 
         $anggotaMagang = DB::table('jabatans')->where('name', '=', 'Anggota Magang')->first();
         for ($i = 1; $i <= 50; $i++) {
-            $this->createUser($anggotaMagang->id, $listId, $randomRate, 'anggota' . $i);
+            $this->createUser($anggotaMagang->id, $listId, $randomRate);
         }
     }
 }

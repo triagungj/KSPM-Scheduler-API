@@ -274,27 +274,25 @@ class ScheduleController extends Controller
         ];
     }
 
-    public function generateSchedule(Request $request)
+    public function generateSchedule()
     {
         $user = auth()->user();
         $admin = Admin::where('username', $user->username)->first();
         if ($admin) {
-            $populationTotalRequest = $request->population_total;
-            $mutationRateRequest = $request->mutation_rate / 100;
-            $maxIteration = $request->max_iteration ?? 2;
+            // INISIASI RULES
+            $totalPopulation = 20;
+            $mutationRate = 0.5;
+
             $allPertemuan = clone Pertemuan::all();
             $allSesi = clone Sesi::all();
             $allPartisipan = clone Partisipan::all();
-
-            // INISIASI RULES
-            $totalPopulation = $populationTotalRequest ?? 8;
-            $mutationRate = $mutationRateRequest ?? 0.2;
 
             $minMaxPartisipan = clone $this->getMaxPartisipanSesi();
             // return $minMaxPartisipan;
 
             $maxFitness = ($allSesi->count() * $minMaxPartisipan->count()) + ($allPartisipan->count() * $allPertemuan->count());
             // $maxFitness = $allSesi->count() * $minMaxPartisipan->count();
+
 
             // MENGAMBIL JADWAL KANDIDAT DARI DATABASE
             $listScheduleCandidates = clone $this->getScheduleCandidates();
@@ -325,23 +323,33 @@ class ScheduleController extends Controller
                 ));
             }
 
+            // $temp = $population->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
+            // return $population[0];
+
+
             $isLooping = true;
-            set_time_limit($maxIteration * $populationTotalRequest);
+            set_time_limit(0);
             $count = 0;
             $population = $population->sortBy('fitness', SORT_NUMERIC, true);
             while ($isLooping) {
                 $scheduleChild1 = new Collection();
                 $scheduleChild2 = new Collection();
 
-                $parent1 = clone $population[0]->schedule;
+                $newPopulation = $population->values();
+
+                $parent1 = clone $newPopulation[0]->schedule;
                 $randomIndex = rand(1, ceil($population->count() / 2) - 1);
-                $parent2 = clone $population[$randomIndex]->schedule;
+                $parent2 = clone $newPopulation[$randomIndex]->schedule;
+
 
                 // $offspring1Parent1 = clone $parent1;
                 // $offspring2Parent1 = $offspring1Parent1->splice($cutPoint);
 
                 // $offspring1Parent2 = clone $parent2;
                 // $offspring2Parent2 = $offspring1Parent2->splice($cutPoint);
+
+                // $scheduleChild1 = new Collection();
+                // $scheduleChild2 = new Collection();
 
                 // foreach ($offspring1Parent1 as $offspring) {
                 //     $scheduleChild1->push($offspring);
@@ -358,6 +366,15 @@ class ScheduleController extends Controller
                 //     $scheduleChild2->push($offspring);
                 // }
 
+                // for ($i = 1; $i <= $listScheduleCandidates->count(); $i++) {
+                //     if ($i % 2 != 0) {
+                //         $scheduleChild1->push($parent1[$i - 1]);
+                //         $scheduleChild2->push($parent2[$i - 1]);
+                //     } else {
+                //         $scheduleChild1->push($parent2[$i - 1]);
+                //         $scheduleChild2->push($parent1[$i - 1]);
+                //     }
+                // }
 
                 $counter = 0;
                 foreach ($allSesi as $sesi) {
@@ -382,123 +399,108 @@ class ScheduleController extends Controller
                     }
                 }
 
-                $scheduleChildIndividu1 = $this->createIndividu(
+                // return response()->json([
+                //     'parent_1' => [
+                //         'total_parent_1' => $parent1->count(),
+                //         'parent_1' => $parent1,
+                //     ],
+                //     // 'offspring_parent_1' => [
+                //     //     'total_off_spring_1' => $offspring1Parent1->count(),
+                //     //     'off_spring_1' => $offspring1Parent1,
+                //     //     'total_off_spring_2' => $offspring2Parent1->count(),
+                //     //     'off_spring_2' => $offspring2Parent1,
+                //     // ],
+                //     'parent_2' => [
+                //         'total_parent_2' => $parent2->count(),
+                //         'parent_2' => $parent2
+                //     ],
+                //     // 'offspring_parent_2' => [
+                //     //     'total_off_spring_1' => $offspring1Parent2->count(),
+                //     //     'off_spring_1' => $offspring1Parent2,
+                //     //     'total_off_spring_2' => $offspring2Parent2->count(),
+                //     //     'off_spring_2' => $offspring2Parent2,
+                //     // ],
+                //     'child_1' => $scheduleChild1,
+                //     'child_2' => $scheduleChild2,
+                // ]);
+
+                foreach ($scheduleChild1 as $scheduleChild) {
+                    $random = rand(0, 100) / 100;
+                    if ($random <= $mutationRate) {
+                        $scheduleChild->push = !$scheduleChild->push;
+                    }
+                    // if ($random < $mutationRate) {
+                    //     $countPartisipan = $scheduleChild1->whereIn('push', true)->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
+                    //         ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)->count();
+                    //     if ($countPartisipan > 1) {
+                    //         $scheduleChild->push = false;
+                    //     } else {
+                    //         $scheduleChild->push = true;
+                    //     }
+                    // }
+                }
+                foreach ($scheduleChild2 as $scheduleChild) {
+                    $random = rand(0, 100) / 100;
+
+                    if ($random <= $mutationRate) {
+                        $scheduleChild->push = !$scheduleChild->push;
+                    }
+
+                    // if ($random < $mutationRate) {
+                    //     $countPartisipan = $scheduleChild2->whereIn('push', true)->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
+                    //         ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)->count();
+                    //     if ($countPartisipan > 1) {
+                    //         $scheduleChild->push = false;
+                    //     } else {
+                    //         $scheduleChild->push = true;
+                    //     }
+                    // }
+                }
+                $population->push($this->createIndividu(
                     $scheduleChild1,
                     $allPertemuan,
                     $allSesi,
                     $allPartisipan,
                     $minMaxPartisipan,
-                    $maxFitness,
-                );
-                $scheduleChildIndividu2 = $this->createIndividu(
+                    $maxFitness
+                ));
+                $population->push($this->createIndividu(
                     $scheduleChild2,
                     $allPertemuan,
                     $allSesi,
                     $allPartisipan,
                     $minMaxPartisipan,
-                    $maxFitness,
-                );
-
-                if ($scheduleChildIndividu1->fitness_total == $maxFitness) {
-                    $population->push($scheduleChildIndividu1);
-                } else {
-                    foreach ($scheduleChild1->shuffle() as $scheduleChild) {
-                        $random = rand(0, 100) / 100;
-                        $maxPartisipanSesi = $minMaxPartisipan->firstWhere('id', $scheduleChild->schedule->jabatan_category_id)->max;
-                        $jabatanCount = $scheduleChild1->whereIn('push', true)
-                            ->whereIn('schedule.jabatan_category_id', $scheduleChild->schedule->jabatan_category_id)
-                            ->whereIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id)
-                            ->count();
-                        if ($jabatanCount > $maxPartisipanSesi) {
-                            $scheduleChild->push = false;
-                        } else {
-
-                            if ($random <= $mutationRate) {
-                                $scheduleChild->push = !$scheduleChild->push;
-                            }
-                            if ($scheduleChild->push) {
-                                $parentExclude = $scheduleChild1
-                                    ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
-                                    ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
-                                    ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
-                                foreach ($parentExclude as $parentExcludeSchedule) {
-                                    $parentExcludeSchedule->push = false;
-                                }
-                            }
-                        }
-                    }
-                    $mutantscheduleChild1 = $this->createIndividu(
-                        $scheduleChild1,
-                        $allPertemuan,
-                        $allSesi,
-                        $allPartisipan,
-                        $minMaxPartisipan,
-                        $maxFitness
-                    );
-                    if ($scheduleChildIndividu1->fitness > $mutantscheduleChild1->fitness) {
-                        $population->push($scheduleChildIndividu1);
-                    } else {
-                        $population->push($mutantscheduleChild1);
-                    }
-                }
-
-                if ($scheduleChildIndividu2->fitness_total == $maxFitness) {
-                    $population->push($scheduleChildIndividu2);
-                } else {
-                    foreach ($scheduleChild2->shuffle() as $scheduleChild) {
-                        $random = rand(0, 100) / 100;
-
-                        $maxPartisipanSesi = $minMaxPartisipan->firstWhere('id', $scheduleChild->schedule->jabatan_category_id)->max;
-                        $jabatanCount = $scheduleChild2->whereIn('push', true)
-                            ->whereIn('schedule.jabatan_category_id', $scheduleChild->schedule->jabatan_category_id)
-                            ->whereIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id)
-                            ->count();
-                        if ($jabatanCount > $maxPartisipanSesi) {
-                            $scheduleChild->push = false;
-                        } else {
-
-                            if ($random <= $mutationRate) {
-                                $scheduleChild->push = !$scheduleChild->push;
-                            }
-                            if ($scheduleChild->push) {
-                                $parentExclude = $scheduleChild2
-                                    ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
-                                    ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
-                                    ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
-                                foreach ($parentExclude as $parentExcludeSchedule) {
-                                    $parentExcludeSchedule->push = false;
-                                }
-                            }
-                        }
-                    }
-                    $mutantscheduleChild2 = $this->createIndividu(
-                        $scheduleChild2,
-                        $allPertemuan,
-                        $allSesi,
-                        $allPartisipan,
-                        $minMaxPartisipan,
-                        $maxFitness
-                    );
-                    if ($scheduleChildIndividu2->fitness > $mutantscheduleChild2->fitness) {
-                        $population->push($scheduleChildIndividu2);
-                    } else {
-                        $population->push($mutantscheduleChild2);
-                    }
-                }
+                    $maxFitness
+                ));
 
                 $population = $population->sortBy('fitness', SORT_NUMERIC, true);
                 $population = $population->splice(0, -2);
 
+                // $fitCount = $population->whereBetween('fitness', [0.9, 1])->count();
                 $fitCount = $population->whereIn('fitness_total', $maxFitness)->count();
                 if ($fitCount > 0) {
                     $isLooping = false;
                 }
 
                 $count++;
-                if ($count == $maxIteration) {
+                if ($count == 100) {
                     $isLooping = false;
                 }
             }
+
+            // $population = $population->sortBy('fitness', SORT_REGULAR, true)->values();
+            // $temp = $population->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
+            // return response()->json([
+            //     'total' => $listScheduleCandidates->count(),
+            //     'data' => $cutPoint,
+            //     'list_fitness' => $temp,
+            //     // 'population' => $newPopulation,
+            //     // 'parent1' => $parent1,
+            //     // 'parent2' => $parent2,
+            //     'max_fitness' => $maxFitness,
+            //     'best_individu' => $population->first(),
+            // ]);
+
 
             $collection = DB::table('sesis')
                 ->selectRaw('count(id) as total, hari')
@@ -540,21 +542,279 @@ class ScheduleController extends Controller
                 ];
                 array_push($result, $detailResult);
             }
+
+            // $temp = $individu->sortBy('fitness', SORT_NUMERIC, true)->all(); 
+            $temp = $population->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
             return
                 response()->json(
                     [
                         'status' => 200,
                         'message' => 'Generate jadwal berhasil',
+                        // 'individu' => $temp[0],
+                        // 'individu2' => $temp[1],
                         'max_fitness' => $maxFitness,
                         'fitness_total' => $bestIndividu->fitness_total,
-                        'fitness' => ($bestIndividu->fitness * 100) . ' %',
+                        'fitness' => $bestIndividu->fitness,
+                        'list_fitness' => $temp,
+
                         'data' => $result,
+                        'list' => $bestIndividu->schedule,
+                        // 'count' => $bestIndividu->schedule->count(),
                     ],
                 );
         } else {
             return response()->json(['message' => 'Tidak memiliki akses'], 401);
         }
     }
+
+    // public function generate()
+    // {
+    //     $user = auth()->user();
+    //     $admin =
+    //         Admin::where('username', $user->username)->first();
+
+    //     if ($admin) {
+    //         $population = 4;
+    //         $mutationRate = 0.5;
+    //         $allPertemuan = Pertemuan::all();
+    //         $allSesi = Sesi::all();
+    //         $allPartisipan = Partisipan::all();
+    //         $individu = new Collection();
+
+    //         $rowListPartisipanTotal = DB::table('partisipans')
+    //             ->select('jabatan_categories.id', 'jabatan_categories.name', DB::raw('count(*) as total'))
+    //             ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+    //             ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+    //             ->groupBy('jabatan_categories.name')
+    //             ->get();
+
+    //         $listPartisipanTotal = new Collection();
+    //         foreach ($rowListPartisipanTotal as $rowPartisipanTotal) {
+    //             $listPartisipanTotal->push((object)[
+    //                 'id' => $rowPartisipanTotal->id,
+    //                 'name' => $rowPartisipanTotal->name,
+    //                 'min' => ceil($rowPartisipanTotal->total / ($allSesi->count() / $allPertemuan->count()) / 2),
+    //                 'max' => ceil($rowPartisipanTotal->total / ($allSesi->count() / $allPertemuan->count())),
+    //             ]);
+    //         }
+
+    //         $maxFitness = ($allSesi->count() * $listPartisipanTotal->count()) + ($allPartisipan->count() * $allPertemuan->count());
+    //         // $maxFitness = ($allSesi->count() * $listPartisipanTotal->count());
+
+    //         $scheduleCandidates = DB::table('schedule_candidates')
+    //             ->select([
+    //                 'schedule_candidates.id as schedule_candidate_id',
+    //                 'session_id as sesi_id',
+    //                 'sesis.pertemuan_id as pertemuan_id',
+    //                 'partisipans.id as partisipan_id',
+    //                 'partisipans.name as partisipan_name',
+    //                 'jabatan_categories.name as jabatan_category',
+    //                 'jabatans.jabatan_category_id'
+    //             ])
+    //             ->join('sesis', 'schedule_candidates.session_id', '=', 'sesis.id')
+    //             ->join('schedule_requests', 'schedule_requests.id', '=', 'schedule_candidates.schedule_request_id')
+    //             ->join('partisipans', 'partisipans.id', '=', 'schedule_requests.partisipan_id')
+    //             ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
+    //             ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
+    //             ->where('status', '=', StatusEnum::Accepted)
+    //             ->orderBy('sesis.pertemuan_id')
+    //             ->get();
+
+    //         $cutPoint = $scheduleCandidates->whereIn('pertemuan_id', $scheduleCandidates->first()->pertemuan_id)->count();
+
+    //         // INISIASI POPULASI AWAL
+    //         for ($i = 0; $i < $population; $i++) {
+    //             $candidates = new Collection();
+    //             foreach ($scheduleCandidates as $scheduleCandidate) {
+    //                 $randomValue = rand(0, 1) == 1;
+    //                 // $counting = $candidates->whereIn('schedule.partisipan_id', $scheduleCandidate->partisipan_id)
+    //                 //     ->whereIn('schedule.pertemuan_id', $scheduleCandidate->pertemuan_id)->count();
+
+    //                 // if ($counting == 0)
+    //                 $candidates->push((object)[
+    //                     'push' => $randomValue,
+    //                     'schedule' => $scheduleCandidate,
+    //                 ]);
+    //             }
+    //             $individu->push($this->createIndividu(
+    //                 $candidates,
+    //                 $allPertemuan,
+    //                 $allSesi,
+    //                 $allPartisipan,
+    //                 $listPartisipanTotal,
+    //                 $maxFitness
+    //             ));
+    //         }
+
+    //         $isLooping = true;
+    //         $count = 0;
+    //         set_time_limit(0);
+    //         while ($isLooping) {
+    //             $individu->sortBy('fitness', SORT_NUMERIC, true);
+    //             $parent1 = clone $individu[0];
+    //             $parent2 = clone $individu[1];
+
+    //             $offspring1Parent1 = $parent1->schedule;
+    //             $offspring2Parent2 = $parent2->schedule;
+
+    //             $offspring2Parent1 = $offspring1Parent1->splice($cutPoint);
+    //             $offspring1Parent2 = $offspring2Parent2->splice($cutPoint);
+
+    //             $scheduleChild1 = new Collection();
+    //             $scheduleChild2 = new Collection();
+
+    //             foreach ($offspring1Parent1 as $offspring) {
+    //                 $scheduleChild1->push($offspring);
+    //             }
+    //             foreach ($offspring1Parent2 as $offspring) {
+    //                 $scheduleChild1->push($offspring);
+    //             }
+
+    //             foreach ($offspring2Parent1 as $offspring) {
+    //                 $scheduleChild2->push($offspring);
+    //             }
+    //             foreach ($offspring2Parent2 as $offspring) {
+    //                 $scheduleChild2->push($offspring);
+    //             }
+
+    //             $slice = $individu->splice(0, -2);
+
+    //             foreach ($scheduleChild1 as $schedule) {
+    //                 $random = rand(0, 100) / 100;
+    //                 // if ($random < $mutationRate) {
+    //                 //     $schedule->push = !$schedule->push;
+    //                 // }
+    //                 if ($random < $mutationRate) {
+    //                     $countPartisipan = $scheduleChild1->whereIn('push', true)->whereIn('schedule.partisipan_id', $schedule->schedule->partisipan_id)
+    //                         ->whereIn('schedule.pertemuan_id', $schedule->schedule->pertemuan_id)->count();
+    //                     if ($countPartisipan > 1) {
+    //                         $schedule->push = false;
+    //                     } else {
+    //                         $schedule->push = true;
+    //                     }
+    //                 }
+    //             }
+    //             foreach ($scheduleChild2 as $schedule) {
+    //                 $random = rand(0, 100) / 100;
+    //                 // if ($random < $mutationRate) {
+    //                 //     $schedule->push = !$schedule->push;
+    //                 // }
+    //                 if ($random < $mutationRate) {
+    //                     $countPartisipan = $scheduleChild2->whereIn('push', true)->whereIn('schedule.partisipan_id', $schedule->schedule->partisipan_id)
+    //                         ->whereIn('schedule.pertemuan_id', $schedule->schedule->pertemuan_id)->count();
+    //                     if ($countPartisipan > 1) {
+    //                         $schedule->push = false;
+    //                     } else {
+    //                         $schedule->push = true;
+    //                     }
+    //                 }
+    //             }
+
+    //             $individu->push($this->createIndividu(
+    //                 $scheduleChild1,
+    //                 $allPertemuan,
+    //                 $allSesi,
+    //                 $allPartisipan,
+    //                 $listPartisipanTotal,
+    //                 $maxFitness
+    //             ));
+    //             $individu->push($this->createIndividu(
+    //                 $scheduleChild2,
+    //                 $allPertemuan,
+    //                 $allSesi,
+    //                 $allPartisipan,
+    //                 $listPartisipanTotal,
+    //                 $maxFitness
+    //             ));
+
+    //             // $fitCount = $individu->whereBetween('fitness', [0.2, 1])->count();
+    //             $fitCount = $individu->whereIn('fitness', 1)->count();
+    //             if ($fitCount > 0) {
+    //                 $isLooping = false;
+    //             }
+
+    //             // $count++;
+    //             // if ($count > 3000) {
+    //             //     $isLooping = false;
+    //             // }
+    //         }
+
+
+    //         // $temp = $individu->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
+    //         // return
+    //         //     response()->json(
+    //         //         [
+    //         //             'status' => 200,
+    //         //             'data' => $temp,
+    //         //         ],
+    //         //     );
+    //         // $temp = $individu->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
+    //         // return response()->json(['fitness' => $temp]);
+
+    //         $collection = DB::table('sesis')
+    //             ->selectRaw('count(id) as total, hari')
+    //             ->groupBy('hari')
+    //             ->get();
+
+
+    //         $result = [];
+    //         $individu = $individu->sortBy('fitness', SORT_NUMERIC, true);
+
+    //         foreach ($collection as $data) {
+    //             $listSesi = Sesi::where('hari', $data->hari)->get();
+    //             $listDetailSesi = [];
+    //             foreach ($listSesi as $sesi) {
+    //                 $pengurus = [];
+    //                 $anggota = [];
+    //                 $schedules = $individu->first()->schedule->whereIn('schedule.sesi_id', $sesi->id)->all();
+
+    //                 foreach ($schedules as $schedule) {
+    //                     if ($schedule->schedule->sesi_id == $sesi->id) {
+    //                         if ($schedule->schedule->jabatan_category == 'Anggota') {
+    //                             array_push($anggota, $schedule->schedule);
+    //                         } else {
+    //                             array_push($pengurus, $schedule->schedule);
+    //                         }
+    //                     }
+    //                 }
+    //                 $detailSesi = [
+    //                     'name' => $sesi->name,
+    //                     'waktu' => $sesi->waktu,
+    //                     'pengurus' => $pengurus,
+    //                     'anggota' => $anggota
+    //                 ];
+    //                 array_push($listDetailSesi, $detailSesi);
+    //             }
+    //             $detailResult = [
+    //                 'hari' => $data->hari,
+    //                 'list_sesi' => $listDetailSesi,
+    //             ];
+    //             array_push($result, $detailResult);
+    //         }
+
+    //         // $temp = $individu->sortBy('fitness', SORT_NUMERIC, true)->all(); 
+    //         $temp = $individu->sortBy('fitness', SORT_NUMERIC, true)->pluck('fitness')->toArray();
+    //         return
+    //             response()->json(
+    //                 [
+    //                     'status' => 200,
+    //                     'message' => 'Generate jadwal berhasil',
+    //                     // 'individu' => $temp[0],
+    //                     // 'individu2' => $temp[1],
+    //                     'max_fitness' => $maxFitness,
+    //                     'fitness_total' => $individu->first()->fitness_total,
+    //                     'fitness' => $individu->first()->fitness,
+    //                     'list_fitness' => $temp,
+
+    //                     // 'data' => $result,
+    //                     'data' => $individu->first()->schedule,
+    //                     'count' => $individu->first()->schedule->count(),
+    //                 ],
+    //             );
+    //     } else {
+    //         return response()->json(['message' => 'Tidak memiliki akses'], 401);
+    //     }
+    // }
 
     public function getAllSchedule()
     {
