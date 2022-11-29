@@ -304,26 +304,17 @@ class ScheduleController extends Controller
             }
 
             $populationTotalRequest = $request->population_total;
-            $mutationRateRequest = $request->mutation_rate >= 0 ? $request->mutation_rate / 100 : 0;
-            $maxIteration = $request->max_iteration >= 0 ? $request->max_iteration : 2;
-
-            if ($populationTotalRequest <= 2) {
-                return response()->json(
-                    [
-                        'status' => 403,
-                        'message' => 'Populasi harus lebih dari 2.',
-                    ],
-                    403
-                );
-            }
+            $mutationRateRequest = $request->mutation_rate;
+            $maxIterationRequest = $request->max_iteration;
 
             $allPertemuan = clone Pertemuan::all();
             $allSesi = clone Sesi::all();
             $allPartisipan = clone Partisipan::all();
 
             // INISIASI RULES
-            $totalPopulation = $populationTotalRequest ?? 8;
-            $mutationRate = $mutationRateRequest ?? 0.2;
+            $totalPopulation = $populationTotalRequest ?? 4;
+            $mutationRate = $mutationRateRequest != null ? $mutationRateRequest / 100 : 0.2;
+            $maxIteration = $maxIterationRequest ?? 2;
 
             $minMaxPartisipan = clone $this->getMaxPartisipanSesi();
             // return $minMaxPartisipan;
