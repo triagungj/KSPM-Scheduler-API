@@ -114,7 +114,7 @@ class AccountController extends Controller
             Admin::where('username', $auth->username)->first();
         if ($admin) {
             $validator = Validator::make($request->all(), [
-                'username' => 'required|string|max:255|min:8',
+                'username' => 'required|string|max:255|alpha_dash|unique:partisipans,username,' . $id,
                 'name' => 'required|string|max:255',
                 'password' => $request->password != ''
                     ? 'required|string|min:8'

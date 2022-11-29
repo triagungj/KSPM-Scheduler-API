@@ -279,9 +279,44 @@ class ScheduleController extends Controller
         $user = auth()->user();
         $admin = Admin::where('username', $user->username)->first();
         if ($admin) {
+            $partisipanNull = DB::table('partisipans')
+                ->where('jabatan_id', '=', null)
+                ->count();
+            if ($partisipanNull > 0) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat Partisipan yang belum mengisi data Jabatan.',
+                    ],
+                    403
+                );
+            }
+            $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
+            $totalPartisipan = DB::table('partisipans')->count();
+            if ($totalAccepted < $totalPartisipan) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat ajuan Jadwal yang belum diterima petugas.',
+                    ],
+                    403
+                );
+            }
+
             $populationTotalRequest = $request->population_total;
-            $mutationRateRequest = $request->mutation_rate / 100;
-            $maxIteration = $request->max_iteration ?? 2;
+            $mutationRateRequest = $request->mutation_rate >= 0 ? $request->mutation_rate / 100 : 0;
+            $maxIteration = $request->max_iteration >= 0 ? $request->max_iteration : 2;
+
+            if ($populationTotalRequest <= 2) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Populasi harus lebih dari 2.',
+                    ],
+                    403
+                );
+            }
+
             $allPertemuan = clone Pertemuan::all();
             $allSesi = clone Sesi::all();
             $allPartisipan = clone Partisipan::all();
@@ -326,7 +361,7 @@ class ScheduleController extends Controller
             }
 
             $isLooping = true;
-            set_time_limit($maxIteration * $populationTotalRequest);
+            set_time_limit($maxIteration * $totalPopulation * 10);
             $count = 0;
             $population = $population->sortBy('fitness', SORT_NUMERIC, true);
             while ($isLooping) {
@@ -410,20 +445,21 @@ class ScheduleController extends Controller
                             ->whereIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id)
                             ->count();
                         if ($jabatanCount > $maxPartisipanSesi) {
-                            $scheduleChild->push = false;
+                            if ($scheduleChild->push) {
+                                $scheduleChild->push = false;
+                            }
                         } else {
-
                             if ($random <= $mutationRate) {
                                 $scheduleChild->push = !$scheduleChild->push;
                             }
-                            if ($scheduleChild->push) {
-                                $parentExclude = $scheduleChild1
-                                    ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
-                                    ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
-                                    ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
-                                foreach ($parentExclude as $parentExcludeSchedule) {
-                                    $parentExcludeSchedule->push = false;
-                                }
+                        }
+                        if ($scheduleChild->push) {
+                            $parentExclude = $scheduleChild1
+                                ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
+                                ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
+                                ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
+                            foreach ($parentExclude as $parentExcludeSchedule) {
+                                $parentExcludeSchedule->push = false;
                             }
                         }
                     }
@@ -435,11 +471,8 @@ class ScheduleController extends Controller
                         $minMaxPartisipan,
                         $maxFitness
                     );
-                    if ($scheduleChildIndividu1->fitness > $mutantscheduleChild1->fitness) {
-                        $population->push($scheduleChildIndividu1);
-                    } else {
-                        $population->push($mutantscheduleChild1);
-                    }
+
+                    $population->push($mutantscheduleChild1);
                 }
 
                 if ($scheduleChildIndividu2->fitness_total == $maxFitness) {
@@ -454,20 +487,21 @@ class ScheduleController extends Controller
                             ->whereIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id)
                             ->count();
                         if ($jabatanCount > $maxPartisipanSesi) {
-                            $scheduleChild->push = false;
+                            if ($scheduleChild->push) {
+                                $scheduleChild->push = false;
+                            }
                         } else {
-
                             if ($random <= $mutationRate) {
                                 $scheduleChild->push = !$scheduleChild->push;
                             }
-                            if ($scheduleChild->push) {
-                                $parentExclude = $scheduleChild2
-                                    ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
-                                    ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
-                                    ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
-                                foreach ($parentExclude as $parentExcludeSchedule) {
-                                    $parentExcludeSchedule->push = false;
-                                }
+                        }
+                        if ($scheduleChild->push) {
+                            $parentExclude = $scheduleChild2
+                                ->whereIn('schedule.pertemuan_id', $scheduleChild->schedule->pertemuan_id)
+                                ->whereIn('schedule.partisipan_id', $scheduleChild->schedule->partisipan_id)
+                                ->whereNotIn('schedule.sesi_id', $scheduleChild->schedule->sesi_id);
+                            foreach ($parentExclude as $parentExcludeSchedule) {
+                                $parentExcludeSchedule->push = false;
                             }
                         }
                     }
@@ -479,11 +513,8 @@ class ScheduleController extends Controller
                         $minMaxPartisipan,
                         $maxFitness
                     );
-                    if ($scheduleChildIndividu2->fitness > $mutantscheduleChild2->fitness) {
-                        $population->push($scheduleChildIndividu2);
-                    } else {
-                        $population->push($mutantscheduleChild2);
-                    }
+
+                    $population->push($mutantscheduleChild2);
                 }
 
                 $population = $population->sortBy('fitness', SORT_NUMERIC, true);
@@ -653,19 +684,9 @@ class ScheduleController extends Controller
                     403
                 );
             }
-
             $totalAccepted = DB::table('schedule_requests')->where('status', '=', StatusEnum::Accepted)->count();
-            $totalStaff = DB::table('partisipans')
-                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
-                ->where('jabatan_categories.name', '=', 'Staff')
-                ->count();
-            $totalAnggota = DB::table('partisipans')
-                ->join('jabatans', 'jabatans.id', '=', 'partisipans.jabatan_id')
-                ->join('jabatan_categories', 'jabatan_categories.id', '=', 'jabatans.jabatan_category_id')
-                ->where('jabatan_categories.name', '=', 'Anggota')
-                ->count();
-            if ($totalAccepted < $totalStaff + $totalAnggota) {
+            $totalPartisipan = DB::table('partisipans')->count();
+            if ($totalAccepted < $totalPartisipan) {
                 return response()->json(
                     [
                         'status' => 403,
@@ -674,8 +695,29 @@ class ScheduleController extends Controller
                     403
                 );
             }
-            DB::table('schedules')->delete();
+
+            $totalPartisipan = DB::table('partisipans')->count();
+            if ($totalAccepted < $totalPartisipan) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Terdapat ajuan Jadwal yang belum diterima petugas.',
+                    ],
+                    403
+                );
+            }
+
             $listSession = $request->input('schedule_candidates');
+            if (!$listSession) {
+                return response()->json(
+                    [
+                        'status' => 403,
+                        'message' => 'Input Jadwal Kosong',
+                    ],
+                    403
+                );
+            }
+
             $listSessionId = [];
             foreach ($listSession as $sessionRequest) {
                 $session = [
@@ -686,11 +728,32 @@ class ScheduleController extends Controller
                 ];
                 array_push($listSessionId, $session);
             }
+            DB::table('schedules')->delete();
             Schedule::insert($listSessionId);
             return response()->json(
                 [
                     'status' => 200,
                     'message' => 'Jadwal Berhasil Diterbitkan'
+                ],
+            );
+        } else {
+            return response()->json(['message' => 'Tidak memiliki akses'], 401);
+        }
+    }
+
+    public function deleteCurrentSchedule()
+    {
+        $user = auth()->user();
+        $admin =
+            Admin::where('username', $user->username)->first();
+
+        if ($admin) {
+            DB::table('schedules')->delete();
+
+            return response()->json(
+                [
+                    'status' => 200,
+                    'message' => "Berhasil menghapus Jadwal saat ini"
                 ],
             );
         } else {

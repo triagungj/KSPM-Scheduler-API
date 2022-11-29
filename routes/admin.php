@@ -53,6 +53,7 @@ Route::group(['prefix' => 'admin', 'namespace' => 'Admin', 'middleware' => ['aut
     Route::get('schedule/count', [ValidationController::class, 'getListCount']);
     Route::post('schedule/generate', [ScheduleController::class, 'generateSchedule']);
     Route::post('schedule/submit', [ScheduleController::class, 'submitSchedule']);
+    Route::delete('schedule/delete', [ScheduleController::class, 'deleteCurrentSchedule']);
     Route::get('schedule/reset', [ScheduleController::class, 'resetSchedule']);
 
     Route::get('master/pertemuan', [PertemuanController::class, 'index']);
