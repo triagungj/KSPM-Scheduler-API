@@ -18,12 +18,12 @@ class NewsSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        for($i = 0; $i < 25; $i++){
+        for ($i = 0; $i < 10; $i++) {
             News::create([
-            'id' => Str::uuid(),
-            'title' => $faker->text(20),
-            'description' => $faker->text(200),
-        ]);
+                'id' => Str::uuid(),
+                'title' => $faker->text(20),
+                'description' => $faker->text(200),
+            ]);
         }
     }
 }
